@@ -1,1 +1,1 @@
-# HerBalance-AI-Studio
+# Vision-AI-Studio
