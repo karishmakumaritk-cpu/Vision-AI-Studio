@@ -1,26 +1,19 @@
-# Vision AI Studio
+# HerBalance AI Studio
 
-Minimal Vite setup for deploying on Vercel.
+Dev container: Ubuntu 24.04.3 LTS
 
-## Local development
+Quick start:
+1. npm install
+2. npm run dev
+3. Open http://localhost:5173
 
-```bash
-npm install
-npm run dev
-```
+Build:
+- npm run build
 
-## Build
+Deploy:
+- Deploy to Vercel (recommended) or GitHub Pages. Configure build command `npm run build` and publish `dist/`.
 
-```bash
-npm run build
-```
-
-## Vercel settings
-
-Use these values in Vercel:
-
-- Framework Preset: **Vite**
-- Root Directory: **./**
-- Install Command: **npm install**
-- Build Command: **npm run build**
-- Output Directory: **dist**
+Notes:
+- Tailwind CSS included.
+- Pages: /, /services, /products, /contact
+- Replace placeholders (chat widget, payment, voice integrations) with real providers in production.
