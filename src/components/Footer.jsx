@@ -1,109 +1,79 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { HiArrowRight } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
+import { Sparkles, Mail, Phone, MapPin, Instagram, Linkedin, Twitter } from 'lucide-react';
 
-const footerLinks = {
-  Services: [
-    { label: 'AI Websites', href: '#' },
-    { label: 'Business Automation', href: '#' },
-    { label: 'AI Chatbots', href: '#' },
-    { label: 'Voice Agents', href: '#' }
-  ],
-  Products: [
-    { label: 'WhatsApp Bot', href: '#' },
-    { label: 'Voice Support', href: '#' },
-    { label: 'Instagram Kit', href: '#' },
-    { label: 'Pricing', href: '#' }
-  ],
-  Company: [
-    { label: 'About Us', href: '#' },
-    { label: 'Blog', href: '#' },
-    { label: 'Careers', href: '#' },
-    { label: 'Contact', href: '#' }
-  ],
-  Resources: [
-    { label: 'Documentation', href: '#' },
-    { label: 'Help Center', href: '#' },
-    { label: 'Community', href: '#' },
-    { label: 'API Docs', href: '#' }
-  ]
-};
-
-const socialLinks = [
-  { icon: '👍', label: 'Facebook', href: '#' },
-  { icon: '📷', label: 'Instagram', href: '#' },
-  { icon: '🔗', label: 'LinkedIn', href: '#' },
-  { icon: '🐦', label: 'Twitter', href: '#' }
-];
-
-export default function Footer() {
-  const reduce = useReducedMotion();
+const Footer = () => {
+  const footerLinks = {
+    Services: [
+      { name: 'AI Website Development', path: '/services' },
+      { name: 'Business Automation', path: '/services' },
+      { name: 'AI Chatbots', path: '/services' },
+      { name: 'AI Voice Agents', path: '/services' },
+      { name: 'Instagram Growth', path: '/services' },
+    ],
+    Products: [
+      { name: 'WhatsApp Sales Bot', path: '/products' },
+      { name: 'Voice Support Agent', path: '/products' },
+      { name: 'Instagram Reel Kit', path: '/products' },
+      { name: 'Automation Starter Pack', path: '/products' },
+    ],
+    Company: [
+      { name: 'About Us', path: '/' },
+      { name: 'Contact', path: '/contact' },
+      { name: 'Blog', path: '/' },
+      { name: 'Careers', path: '/' },
+    ],
+    Legal: [
+      { name: 'Privacy Policy', path: '/' },
+      { name: 'Terms of Service', path: '/' },
+      { name: 'Cookie Policy', path: '/' },
+    ],
+  };
 
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Newsletter Section */}
-        <motion.div
-          initial={reduce ? {} : { opacity: 0, y: 20 }}
-          whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-16 p-8 rounded-3xl"
-          style={{ background: 'rgba(255,74,0,0.1)', borderLeft: '4px solid var(--primary-orange)' }}
-        >
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-2xl font-bold mb-2">Stay Updated</h3>
-              <p className="text-gray-400">Get the latest AI automation insights delivered to your inbox</p>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 px-4 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-gray-500 focus:outline-none focus:border-primary-orange transition-all"
-              />
-              <button className="px-6 py-3 rounded-full font-bold bg-primary-orange text-white hover:shadow-lg transition-all flex items-center gap-2">
-                <HiArrowRight />
-              </button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Links Grid */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+      <div className="container-custom">
+        {/* Top Section */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary-purple to-primary-blue flex items-center justify-center text-white font-bold">
-                HB
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="font-bold">HerBalance AI</span>
+              <div>
+                <div className="text-xl font-black">HerBalance AI</div>
+                <div className="text-xs text-gray-400">AI that works while you live</div>
+              </div>
             </div>
-            <p className="text-gray-400 text-sm mb-4">AI that works while you live</p>
-            <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  whileHover={reduce ? {} : { scale: 1.2 }}
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary-purple transition-all"
-                  title={social.label}
-                >
-                  {social.icon}
-                </motion.a>
-              ))}
+            <p className="text-gray-400 mb-6 max-w-sm">
+              Empowering Indian businesses with AI automation. Built by experts, designed for growth.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="font-bold mb-4">{category}</h4>
-              <ul className="space-y-3">
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title}>
+              <h4 className="font-bold text-lg mb-4">{title}</h4>
+              <ul className="space-y-2">
                 {links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors text-sm">
-                      {link.label}
-                    </a>
+                  <li key={link.name}>
+                    <Link
+                      to={link.path}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.name}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -111,16 +81,33 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <p>© 2026 HerBalance AI Studio. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+        {/* Contact Info */}
+        <div className="border-t border-gray-800 pt-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-6 text-gray-400">
+            <div className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-primary-400" />
+              <span>karishmakumaritk@gmail.com</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-primary-400" />
+              <span>+91 98186 91915</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <MapPin className="w-5 h-5 text-primary-400" />
+              <span>Delhi, India</span>
+            </div>
           </div>
+        </div>
+
+        {/* Bottom */}
+        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
+          <p>© 2026 HerBalance AI Studio. All rights reserved.</p>
+          <p>Made with ❤️ for Indian Businesses</p>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+
+export default Footer;

@@ -1,34 +1,55 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
-        'primary-purple': '#8B5CF6',
-        'primary-blue': '#3B82F6',
-        'primary-orange': '#FF4A00',
-        'bg-cream': '#FFF8F0',
-        'bg-light': '#F9FAFB',
-        'text-primary': '#1A1A1A',
-        'text-secondary': '#6B7280'
+        primary: {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
+        secondary: {
+          500: '#3b82f6',
+          600: '#2563eb',
+        },
+        accent: {
+          500: '#ff4a00',
+          600: '#e63900',
+        }
       },
       fontFamily: {
-        heading: ['Inter', 'SF Pro Display', 'ui-sans-serif', 'system-ui'],
-        body: ['Inter', 'ui-sans-serif', 'system-ui']
-      },
-      fontSize: {
-        'h1': ['4.5rem', { lineHeight: '1.05' }],
-        'h2': ['3rem', { lineHeight: '1.05' }],
-        'h3': ['2rem', { lineHeight: '1.1' }],
-        'body-lg': ['1.25rem', { lineHeight: '1.6' }]
-      },
-      borderRadius: {
-        'xl-2': '24px'
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        'zap-card': '0 10px 30px rgba(16,24,40,0.08)',
-        'zap-strong': '0 20px 50px rgba(16,24,40,0.12)'
+        'glow': '0 0 20px rgba(139, 92, 246, 0.4)',
+        'glow-lg': '0 0 40px rgba(139, 92, 246, 0.3)',
+      },
+      animation: {
+        'float': 'float 3s ease-in-out infinite',
+        'fade-in-up': 'fadeInUp 0.8s ease-out',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        }
       }
-    }
+    },
   },
-  plugins: []
-};
+  plugins: [],
+}

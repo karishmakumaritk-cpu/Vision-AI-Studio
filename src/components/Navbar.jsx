@@ -1,55 +1,124 @@
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Sparkles } from 'lucide-react';
 
-export default function Navbar() {
-  const [open, setOpen] = useState(false);
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Services', path: '/services' },
+    { name: 'Products', path: '/products' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
   return (
-    <motion.nav initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5 }} className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-100 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-10">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary-purple to-primary-blue flex items-center justify-center text-white font-bold">HB</div>
-            <span className="font-semibold text-lg">HerBalance AI</span>
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/80 backdrop-blur-lg shadow-lg'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="container-custom">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-xl font-black text-gray-900">HerBalance AI</div>
+              <div className="text-xs text-gray-500 -mt-1">AI that works while you live</div>
+            </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-8">
-            <NavLink to="/services" className="text-gray-700 hover:text-gray-900">Services</NavLink>
-            <NavLink to="/products" className="text-gray-700 hover:text-gray-900">Products</NavLink>
-            <NavLink to="/services" className="text-gray-700 hover:text-gray-900">Pricing</NavLink>
-            <NavLink to="/contact" className="text-gray-700 hover:text-gray-900">Contact</NavLink>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group"
+              >
+                {link.name}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+              </Link>
+            ))}
           </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <button className="hidden md:inline text-gray-700 hover:text-gray-900">Login</button>
-          <Link to="/contact" className="hidden md:inline-block">
-            <button className="px-6 py-2.5 rounded-full text-white font-semibold" style={{ background: 'linear-gradient(90deg,var(--primary-purple),var(--primary-blue))', boxShadow: '0 8px 28px rgba(139,92,246,0.18)' }}>
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link
+              to="/contact"
+              className="text-gray-700 hover:text-primary-600 font-semibold transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              to="/contact"
+              className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-glow transition-all hover:scale-105"
+            >
               Get Started
-            </button>
-          </Link>
-
-          <div className="md:hidden">
-            <button onClick={() => setOpen(!open)} aria-label="Toggle menu" className="p-2 rounded-md">
-              {open ? <HiX size={22} /> : <HiMenu size={22} />}
-            </button>
+            </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-gray-700 hover:text-primary-600 transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
-        {open && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="md:hidden bg-white border-t">
-            <div className="px-6 py-4 flex flex-col gap-3">
-              <Link to="/services" onClick={() => setOpen(false)}>Services</Link>
-              <Link to="/products" onClick={() => setOpen(false)}>Products</Link>
-              <Link to="/contact" onClick={() => setOpen(false)}>Contact</Link>
-              <Link to="/contact" onClick={() => setOpen(false)} className="mt-2 inline-block px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white text-center">Get Started</Link>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-gray-100"
+          >
+            <div className="container-custom py-6 space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <Link
+                to="/contact"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-6 py-3 rounded-full font-semibold text-center hover:shadow-glow transition-all"
+              >
+                Get Started
+              </Link>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.nav>
   );
-}
+};
+
+export default Navbar;
