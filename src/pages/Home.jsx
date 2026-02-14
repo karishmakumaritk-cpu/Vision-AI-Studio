@@ -1,213 +1,364 @@
-import React, { useState } from 'react';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import Hero from '../components/Hero';
+import ServiceCard from '../components/ServiceCard';
+import ProductCard from '../components/ProductCard';
+import { motion } from 'framer-motion';
+import { Globe, Zap, Bot, Phone, Instagram, CheckCircle, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const servicesGrid = [
-  { icon: '🌐', title: 'AI-Powered Websites', desc: 'Smart websites that talk, sell & support automatically' },
-  { icon: '⚙️', title: 'Business Automation', desc: 'Leads, Sales & Support automation for Indian businesses' },
-  { icon: '💬', title: 'AI Chatbots', desc: 'Website, WhatsApp & Instagram bots that reply like humans' },
-  { icon: '📞', title: 'AI Voice Agents', desc: 'Calls, follow-ups & customer support automation' },
-  { icon: '📱', title: 'Content & Reel Automation', desc: 'Reel ideas, captions & posting automation' }
-];
+const Home = () => {
+  const services = [
+    {
+      icon: Globe,
+      title: 'AI-Powered Websites',
+      description: 'Smart websites that talk, sell & support automatically.',
+      features: [
+        'AI chatbot integration',
+        'Lead capture system',
+        'Email + WhatsApp automation',
+        'Admin dashboard',
+      ],
+    },
+    {
+      icon: Zap,
+      title: 'Business Automation',
+      description: 'Convert every enquiry into a paying customer.',
+      features: [
+        'Lead follow-ups',
+        'Abandoned cart recovery',
+        'Customer complaint handling',
+        'Order updates',
+      ],
+    },
+    {
+      icon: Bot,
+      title: 'AI Chatbots',
+      description: 'Website, WhatsApp & Instagram bots that reply like humans.',
+      features: [
+        'FAQs automation',
+        'Sales assistance',
+        '24/7 Support',
+        'Appointment booking',
+      ],
+    },
+    {
+      icon: Phone,
+      title: 'AI Voice Agents',
+      description: 'Never miss a call again.',
+      features: [
+        'Incoming call handling',
+        'Appointment booking',
+        'Order status updates',
+        'Complaint escalation',
+      ],
+    },
+    {
+      icon: Instagram,
+      title: 'Instagram Growth',
+      description: 'Content + reach + consistency — automated.',
+      features: [
+        'Reel ideas generation',
+        'Caption writing',
+        'Hashtag research',
+        'DM automation',
+      ],
+    },
+  ];
 
-const whyFeatures = [
-  { title: 'Built by Real AI Expert', desc: 'Custom-coded solutions, not templates. Every feature designed for your business.' },
-  { title: 'Designed for Indian Businesses', desc: 'Localized workflows, payment methods, language support, and market understanding.' },
-  { title: 'Female-First Empathy + Logic', desc: 'Built with empathy for user needs and logic for business growth.' },
-  { title: 'Saves Time, Money & Mental Load', desc: 'Focus on growth while AI handles repetitive tasks 24/7.' }
-];
+  const products = [
+    {
+      name: 'AI WhatsApp Sales Bot',
+      price: '1,999',
+      period: 'month',
+      features: [
+        'Auto replies to messages',
+        'Order taking & processing',
+        'Payment link generation',
+        'Basic analytics',
+      ],
+      popular: false,
+    },
+    {
+      name: 'AI Voice Support Agent',
+      price: '3,999',
+      period: 'month',
+      features: [
+        'Incoming call handling',
+        'Complaint resolution',
+        'Lead transfer to sales',
+        'Call recordings & analytics',
+        'Multi-language support',
+      ],
+      popular: true,
+    },
+    {
+      name: 'Instagram Reel AI Kit',
+      price: '999',
+      period: 'one-time',
+      features: [
+        'AI reel ideas generator',
+        'Script templates',
+        'Caption writer',
+        'Posting reminders',
+      ],
+      popular: false,
+    },
+  ];
 
-export default function Home() {
-	const [demoOpen, setDemoOpen] = useState(false);
-	const reduce = useReducedMotion();
+  const whyChooseUs = [
+    {
+      title: 'Built by Real AI Experts',
+      description: 'Not templates — every solution is custom-coded for your specific needs.',
+      icon: '🎯',
+    },
+    {
+      title: 'Designed for Indian Businesses',
+      description: 'Understanding of local market, languages, and business practices.',
+      icon: '🇮🇳',
+    },
+    {
+      title: 'Female-First Empathy + Logic',
+      description: 'Unique perspective combining technical excellence with human understanding.',
+      icon: '💜',
+    },
+    {
+      title: 'Saves Time, Money & Mental Load',
+      description: 'Automation that actually works, reducing your daily workload by 70%.',
+      icon: '⚡',
+    },
+  ];
 
-	return (
-		<div className="pt-28"> {/* account for fixed navbar */}
-			<section className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #fff 0%, #fbfbff 100%)', paddingTop: '120px', paddingBottom: '80px' }}>
-				{/* abstract shapes */}
-				<div className="absolute -right-40 -top-40 w-[600px] h-[600px] rounded-full bg-primary-purple opacity-10 blur-3xl pointer-events-none" />
+  const stats = [
+    { number: '150+', label: 'Happy Clients' },
+    { number: '500+', label: 'Projects Delivered' },
+    { number: '24/7', label: 'AI Support' },
+    { number: '99%', label: 'Satisfaction Rate' },
+  ];
 
-				<div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
-					{/* Left: text */}
-					<div>
-						<motion.h1 className="hero-title text-text-primary mb-6" initial={reduce ? {} : { opacity: 0, y: 30 }} animate={reduce ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
-							Build Your Business on <span className="bg-clip-text text-transparent" style={{ background: 'linear-gradient(90deg,var(--primary-purple),var(--primary-blue))' }}>Autopilot</span> with AI
-						</motion.h1>
+  return (
+    <div className="min-h-screen">
+      {/* Hero */}
+      <Hero />      {/* Stats */}
+      <section className="py-16 bg-white border-y border-gray-100">
+        <div className="container-custom">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl md:text-5xl font-black text-primary-600 mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 font-medium">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-						<motion.p className="text-xl text-text-secondary mb-8 max-w-xl" initial={reduce ? {} : { opacity: 0, y: 18 }} animate={reduce ? {} : { opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.6 }}>
-							Websites, Automation, AI Chatbots & Voice Agents — custom-built to grow your brand 24×7
-						</motion.p>
+      {/* What We Do */}
+      <section className="section bg-gray-50">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Everything You Need to{' '}
+              <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Automate & Grow
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From websites to voice agents — we build AI solutions that work while you sleep
+            </p>
+          </motion.div>
 
-						<div className="flex flex-wrap gap-4">
-							<motion.a href="/contact" id="book" whileHover={reduce ? {} : { scale: 1.03 }} whileTap={reduce ? {} : { scale: 0.98 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
-								<button className="px-8 py-4 rounded-full text-lg font-semibold text-white" style={{ background: 'linear-gradient(90deg,var(--primary-orange),#FF6B35)', boxShadow: '0 12px 40px rgba(255,74,0,0.14)' }}>
-									🚀 Book Free AI Consultation
-								</button>
-							</motion.a>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, idx) => (
+              <ServiceCard key={idx} {...service} delay={idx * 0.1} />
+            ))}
+          </div>
+        </div>
+      </section>
 
-							<motion.button whileHover={reduce ? {} : { scale: 1.03 }} whileTap={reduce ? {} : { scale: 0.98 }} className="bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold border-2 border-gray-100 shadow" onClick={() => setDemoOpen(true)}>
-								🤖 Try Live AI Demo
-							</motion.button>
-						</div>
+      {/* Why Choose Us */}
+      <section className="section bg-white">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Why Choose <span className="text-primary-600">HerBalance AI</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We're not just another AI agency — we're your growth partners
+            </p>
+          </motion.div>
 
-						{/* trust badges placeholder */}
-						<div className="flex items-center gap-6 mt-8 opacity-70">
-							<div className="h-8 bg-white/0">Logo1</div>
-							<div className="h-8 bg-white/0">Logo2</div>
-							<div className="h-8 bg-white/0">Logo3</div>
-						</div>
-					</div>
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {whyChooseUs.map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                className="flex gap-6"
+              >
+                <div className="text-5xl flex-shrink-0">{item.icon}</div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
-					{/* Right: visual */}
-					<motion.div initial={reduce ? {} : { opacity: 0, scale: 0.98 }} animate={reduce ? {} : { opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.8 }} className="relative">
-						<div className="rounded-2xl shadow-zap-strong bg-white p-6" style={{ borderRadius: '24px' }}>
-							<div className="h-80 flex items-center justify-center text-gray-400">Hero visual / product mockup</div>
-						</div>
-					</motion.div>
-				</div>
-			</section>
+          {/* Feature Image Section */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80"
+                alt="Professional woman working"
+                className="rounded-2xl shadow-2xl w-full"
+              />
+              <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-6 max-w-xs">
+                <div className="flex items-center gap-3 mb-2">
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                </div>
+                <p className="text-sm text-gray-600 italic">
+                  "HerBalance AI transformed our business overnight!"
+                </p>
+                <p className="text-xs text-gray-500 mt-2">— Priya S., E-commerce Owner</p>
+              </div>
+            </motion.div>
 
-			<section className="mt-10">
-				<h2 className="text-2xl font-semibold">What We Do</h2>
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mt-4">
-					<Card title="AI-Powered Websites">
-						Smart websites that talk, sell & support automatically
-					</Card>
-					<Card title="Business Automation">
-						Leads, Sales & Support automation for Indian businesses
-					</Card>
-					<Card title="AI Chatbots">
-						Website, WhatsApp & Instagram bots that reply like humans
-					</Card>
-					<Card title="AI Voice Agents">
-						Calls, follow-ups & customer support automation
-					</Card>
-					<Card title="Content & Reel Automation">
-						Reel ideas, captions & posting automation
-					</Card>
-				</div>
-			</section>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">
+                Female-Led, Expert-Built, Results-Driven
+              </h3>
+              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                As a woman in tech, I understand the unique challenges of running a business. That's why every AI solution we build combines technical excellence with real-world empathy.
+              </p>
+              <ul className="space-y-4">
+                {[
+                  'Custom AI models trained on your specific data',
+                  'Seamless integration with existing tools',
+                  'Ongoing support and optimization',
+                  'ROI-focused implementation strategy',
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-			<section className="mt-10">
-				<h2 className="text-2xl font-semibold">Why HerBalance AI</h2>
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-4">
-					<Card title="Built by a real AI expert, not templates">
-						Practical, custom solutions
-					</Card>
-					<Card title="Automation for Indian businesses">
-						Localized workflows & integrations
-					</Card>
-					<Card title="Female-first empathy + logic">Designs with empathy</Card>
-					<Card title="Saves time, money & mental load">
-						Focus on growth, not chores
-					</Card>
-				</div>
-			</section>
+      {/* Products/Pricing */}
+      <section className="section bg-gradient-to-br from-purple-50 to-blue-50">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Ready-to-Use AI Products
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Start automating today with our plug-and-play AI solutions
+            </p>
+          </motion.div>
 
-			<section className="py-24 bg-white">
-				<div className="max-w-7xl mx-auto px-6">
-					<motion.h2
-						initial={reduce ? {} : { opacity: 0, y: 20 }}
-						whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-						viewport={{ once: true }}
-						className="text-5xl lg:text-6xl font-black text-center mb-4"
-					>
-						What We <span className="bg-clip-text text-transparent" style={{ background: 'linear-gradient(90deg,var(--primary-purple),var(--primary-blue))' }}>Do</span>
-					</motion.h2>
-					<p className="text-xl text-text-secondary text-center max-w-2xl mx-auto mb-16">
-						Everything you need to automate, grow, and scale your business
-					</p>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {products.map((product, idx) => (
+              <ProductCard key={idx} {...product} delay={idx * 0.1} />
+            ))}
+          </div>
 
-					<motion.div
-						variants={reduce ? {} : {
-							hidden: { opacity: 0 },
-							show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-						}}
-						initial="hidden"
-						whileInView="show"
-						viewport={{ once: true, margin: '-100px' }}
-						className="grid md:grid-cols-2 lg:grid-cols-5 gap-6"
-					>
-						{servicesGrid.map((service, idx) => (
-							<motion.div
-								key={idx}
-								variants={reduce ? {} : { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-								whileHover={reduce ? {} : { y: -4, boxShadow: '0 20px 40px rgba(16,24,40,0.1)' }}
-								className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-primary-purple/20 transition-all shadow-zap-card"
-							>
-								<div className="text-4xl mb-4">{service.icon}</div>
-								<h3 className="font-bold text-lg mb-2 text-text-primary">{service.title}</h3>
-								<p className="text-sm text-text-secondary">{service.desc}</p>
-							</motion.div>
-						))}
-					</motion.div>
-				</div>
-			</section>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-gray-600 mb-6">
+              Need something custom? We build tailored AI solutions too.
+            </p>
+            
+            <Link
+              to="/contact"
+              className="inline-block bg-white text-primary-600 px-8 py-4 rounded-full font-bold text-lg border-2 border-primary-200 hover:border-primary-300 hover:shadow-lg transition-all"
+            >
+              Talk to an Expert →
+            </Link>
+          </motion.div>
+        </div>
+      </section>
 
-			<section className="py-24 bg-bg-light">
-				<div className="max-w-7xl mx-auto px-6">
-					<motion.h2
-						initial={reduce ? {} : { opacity: 0, y: 20 }}
-						whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-						viewport={{ once: true }}
-						className="text-5xl lg:text-6xl font-black text-center mb-16"
-					>
-						Why <span className="bg-clip-text text-transparent" style={{ background: 'linear-gradient(90deg,var(--primary-purple),var(--primary-blue))' }}>HerBalance AI</span>
-					</motion.h2>
+      {/* CTA Section */}
+      <section className="section bg-gradient-to-r from-primary-600 to-secondary-600 text-white">
+        <div className="container-custom text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              Ready to Automate Your Business?
+            </h2>
+            <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+              Book a free consultation and discover how AI can 10x your growth
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              
+              <Link
+                to="/contact"
+                className="bg-white text-primary-600 px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl transition-all hover:scale-105"
+              >
+                🚀 Book Free Consultation
+              </Link>
+              
+              <Link
+                to="/products"
+                className="bg-transparent text-white px-8 py-4 rounded-full font-bold text-lg border-2 border-white hover:bg-white hover:text-primary-600 transition-all"
+              >
+                Explore Products
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
 
-					<motion.div
-						variants={reduce ? {} : {
-							hidden: { opacity: 0 },
-							show: { opacity: 1, transition: { staggerChildren: 0.12 } }
-						}}
-						initial="hidden"
-						whileInView="show"
-						viewport={{ once: true }}
-						className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
-					>
-						{whyFeatures.map((feature, idx) => (
-							<motion.div
-								key={idx}
-								variants={reduce ? {} : { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-								whileHover={reduce ? {} : { y: -4 }}
-								className="bg-white rounded-2xl p-8 border border-gray-100 shadow-zap-card"
-							>
-								<div className="w-12 h-12 bg-gradient-to-br from-primary-purple/20 to-primary-blue/20 rounded-xl flex items-center justify-center mb-4 text-2xl">
-									✓
-								</div>
-								<h3 className="font-bold text-lg mb-2 text-text-primary">{feature.title}</h3>
-								<p className="text-text-secondary">{feature.desc}</p>
-							</motion.div>
-						))}
-					</motion.div>
-				</div>
-			</section>
-
-			{/* Demo modal */}
-			<AnimatePresence>
-				{demoOpen && (
-					<motion.div
-						initial={reduce ? {} : { opacity: 0 }}
-						animate={reduce ? {} : { opacity: 1 }}
-						exit={reduce ? {} : { opacity: 0 }}
-						className="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
-					>
-						<motion.div
-							initial={reduce ? {} : { y: 8, opacity: 0 }}
-							animate={reduce ? {} : { y: 0, opacity: 1 }}
-							exit={reduce ? {} : { y: 8, opacity: 0 }}
-							className="bg-white rounded-2xl p-6 max-w-2xl w-full"
-						>
-							<div className="flex justify-between items-center">
-								<h3 className="font-semibold">Live AI Demo</h3>
-								<button onClick={() => setDemoOpen(false)} className="text-sm text-gray-500">Close</button>
-							</div>
-							<div className="mt-4 h-64 bg-gray-50 rounded-lg flex items-center justify-center">Interactive demo placeholder</div>
-						</motion.div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-		</div>
-	);
-}
+export default Home;
