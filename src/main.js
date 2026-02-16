@@ -1,60 +1,72 @@
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || 'https://vision-ai-studio-backend.onrender.com';
+const RAW_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '/api';
+const HEALTH_PATHS = ['/health', '/'];
 
 const app = document.querySelector('#app');
 
 app.innerHTML = `
   <h1>Vision AI Studio</h1>
   <p>
-    Frontend ab backend health check karega. Agar pehli request slow ho, Render free tier
-    sleep mode ki wajah se 30-60 sec lag sakte hain.
+    Frontend + backend connection verify ho raha hai. Agar Render free tier sleep me ho,
+    first response me delay aa sakta hai.
   </p>
 
   <div class="status" id="status-box">
     <strong>Status:</strong> <span id="status-text">Checking backend...</span>
   </div>
 
-  <p><strong>Backend URL:</strong> <code id="backend-url"></code></p>
+  <p><strong>API Base:</strong> <code id="backend-url"></code></p>
 
   <details>
-    <summary>Deployment checklist (Vercel + Render)</summary>
+    <summary>Troubleshooting (Vercel stuck on one page)</summary>
     <ul>
-      <li>Vercel env var set karo: <code>VITE_BACKEND_URL</code></li>
-      <li>Render backend me CORS allow karo frontend origin ke liye</li>
-      <li>Render start command confirm karo (e.g. <code>node server.js</code>)</li>
-      <li>API root/health route se JSON ya text response return karo</li>
+      <li>Vercel env var set karo (optional): <code>VITE_BACKEND_URL</code></li>
+      <li>Best: frontend se <code>/api</code call karo (Vercel rewrite enabled)</li>
+      <li>Render backend me <code>/health</code route return hona chahiye</li>
+      <li>Agar blank ho, browser console me network errors check karo</li>
     </ul>
   </details>
 
-  <p class="pill">Vercel + GitHub Pages + Render ready</p>
+  <pre id="response-preview" class="response">Waiting for response preview...</pre>
 `;
 
 const statusText = document.querySelector('#status-text');
 const statusBox = document.querySelector('#status-box');
 const backendUrlEl = document.querySelector('#backend-url');
-backendUrlEl.textContent = BACKEND_URL;
+const preview = document.querySelector('#response-preview');
+backendUrlEl.textContent = RAW_BACKEND_URL;
+
+const trimSlash = (value) => value.replace(/\/$/, '');
+
+async function tryFetch(path) {
+  const endpoint = `${trimSlash(RAW_BACKEND_URL)}${path}`;
+  const startedAt = Date.now();
+  const response = await fetch(endpoint, { method: 'GET' });
+  const tookMs = Date.now() - startedAt;
+  const body = await response.text();
+  return { endpoint, response, tookMs, body };
+}
 
 async function checkBackend() {
-  const startedAt = Date.now();
+  for (const path of HEALTH_PATHS) {
+    try {
+      const { endpoint, response, tookMs, body } = await tryFetch(path);
 
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'GET'
-    });
+      if (!response.ok) {
+        statusText.textContent = `Reachable but ${response.status} on ${path} (${tookMs}ms)`;
+        statusBox.className = 'status warn';
+        preview.textContent = `Endpoint: ${endpoint}\nStatus: ${response.status}\n\n${body.slice(0, 800)}`;
+        continue;
+      }
 
-    const tookMs = Date.now() - startedAt;
-
-    if (!response.ok) {
-      statusText.textContent = `Backend reachable but returned ${response.status} (${tookMs}ms)`;
-      statusBox.classList.add('warn');
+      statusText.textContent = `Backend connected ✅ (${tookMs}ms via ${path})`;
+      statusBox.className = 'status ok';
+      preview.textContent = `Endpoint: ${endpoint}\nStatus: ${response.status}\n\n${body.slice(0, 800)}`;
       return;
+    } catch (error) {
+      statusText.textContent = `Request failed on ${path}: ${error?.message || 'Unknown error'}`;
+      statusBox.className = 'status err';
+      preview.textContent = String(error?.stack || error?.message || error);
     }
-
-    statusText.textContent = `Backend is reachable ✅ (${tookMs}ms)`;
-    statusBox.classList.add('ok');
-  } catch (error) {
-    statusText.textContent = `Request failed: ${error?.message || 'Unknown error'}`;
-    statusBox.classList.add('err');
   }
 }
 

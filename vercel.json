@@ -3,5 +3,11 @@
   "framework": "vite",
   "installCommand": "npm install",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://vision-ai-studio-backend.onrender.com/$1"
+    }
+  ]
 }

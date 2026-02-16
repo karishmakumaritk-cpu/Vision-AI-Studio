@@ -1,54 +1,44 @@
 # Vision AI Studio
 
-Vite frontend + Render backend deployment guide.
+Vite frontend + Render backend setup (without changing your core workflow).
 
-## 1) Local run
+## Why Vercel shows only one page
 
-```bash
-npm install
-npm run dev
-```
+Aapka deploy technically successful ho sakta hai, lekin agar frontend backend se connect nahi kar pa raha
+(CORS/env/api URL issue), to UI static ek page jaisa dikhta rehta hai.
 
-## 2) Environment variable (IMPORTANT)
+## What is configured now
 
-Frontend API call ke liye `VITE_BACKEND_URL` set karo.
+- Frontend default API base: `/api`
+- `vercel.json` rewrite: `/api/*` -> `https://vision-ai-studio-backend.onrender.com/*`
+- Optional env override: `VITE_BACKEND_URL`
+- Frontend status box + response preview for quick debugging
 
-`.env` example:
+## Vercel settings
+
+- Framework: `Vite`
+- Root: `./`
+- Install: `npm install`
+- Build: `npm run build`
+- Output: `dist`
+
+(Optional) Environment variable:
 
 ```env
 VITE_BACKEND_URL=https://vision-ai-studio-backend.onrender.com
 ```
 
-## 3) Vercel deploy (frontend)
+## Render backend checklist
 
-Vercel project settings:
+- `PORT` se listen karna (already visible in logs)
+- `/health` route add/verify karo
+- CORS allow origins:
+  - your Vercel domain
+  - local dev (`http://localhost:5173`)
 
-- Framework Preset: **Vite**
-- Root Directory: **./**
-- Install Command: **npm install**
-- Build Command: **npm run build**
-- Output Directory: **dist**
-- Environment Variable: `VITE_BACKEND_URL=https://vision-ai-studio-backend.onrender.com`
+## Local run
 
-## 4) Render deploy (backend)
-
-Render logs show server is running on port 10000, which is good. Agar browser pe "blank" lage,
-usually root route response ya frontend API/CORS config issue hota hai.
-
-Backend checklist:
-
-- `PORT` se listen karo (Render provides it)
-- root route (`/`) ya health route (`/health`) pe response return karo
-- CORS me frontend domain allow karo:
-  - Vercel domain
-  - GitHub Pages domain
-  - local dev origin
-
-## 5) GitHub Pages deploy (optional)
-
-Workflow already present at `.github/workflows/deploy-pages.yml`.
-
-1. Repo → **Settings → Pages**
-2. **Source = GitHub Actions**
-3. Push to `main`
-4. URL format: `https://<username>.github.io/Vision-AI-Studio/`
+```bash
+npm install
+npm run dev
+```
