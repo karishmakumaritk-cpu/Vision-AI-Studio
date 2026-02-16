@@ -48,7 +48,7 @@ const AUTOMATIONS = [
     ],
     sampleOutput: [
       'Auto-reply: Thank you for messaging us. We usually respond within 10 minutes.',
-      'Template flow: Booking request -> slot check -> confirmation message',
+      'Template flow: Booking request to slot check to confirmation message',
       'Escalation trigger: Route high-priority chats to human support'
     ]
   },
@@ -205,18 +205,27 @@ const FAQ_BOT_KB = [
 const app = document.querySelector('#app');
 
 app.innerHTML = `
-  <header class="topbar">
+  <div class="fx-background" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div id="particles" class="particles"></div>
+  </div>
+
+  <div class="progress-track"><div id="scroll-progress" class="progress-line"></div></div>
+
+  <header class="topbar glass">
     <div class="brand">Vision AI</div>
     <nav>
       <a href="#catalog">Automations</a>
       <a href="#methods">Methods</a>
       <a href="#products">Products</a>
       <a href="#pricing">Pricing</a>
-      <button class="btn btn-secondary" id="header-trial-btn">Start Free Trial</button>
+      <button class="btn btn-secondary magnetic" id="header-trial-btn">Start Free Trial</button>
     </nav>
   </header>
 
-  <section class="hero protect-content">
+  <section class="hero protect-content reveal">
     <div>
       <p class="eyebrow">Select. Click. Automate. Done in 60 seconds.</p>
       <h1>Stop doing repetitive tasks. Let AI handle them.</h1>
@@ -225,11 +234,11 @@ app.innerHTML = `
         Choose a use-case, answer three questions, preview output, and activate your trial.
       </p>
       <div class="hero-actions">
-        <button class="btn btn-primary" id="hero-start-btn">What do you want to automate today?</button>
-        <button class="btn btn-ghost" id="hero-custom-btn">Describe a custom automation</button>
+        <button class="btn btn-primary magnetic" id="hero-start-btn">What do you want to automate today?</button>
+        <button class="btn btn-ghost magnetic" id="hero-custom-btn">Describe a custom automation</button>
       </div>
     </div>
-    <div class="hero-visual">
+    <div class="hero-visual parallax" data-depth="0.18">
       <img
         src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1400&q=80&auto=format&fit=crop"
         alt="Automation dashboard preview" draggable="false"
@@ -237,36 +246,36 @@ app.innerHTML = `
     </div>
   </section>
 
-  <section class="logo-strip protect-content">
+  <section class="logo-strip protect-content reveal">
     <p>Designed for growing brands, agencies, and online businesses.</p>
   </section>
 
-  <section id="catalog" class="catalog-section protect-content">
+  <section id="catalog" class="catalog-section protect-content reveal">
     <h2>Automation Catalog</h2>
     <p>Choose one automation to start instant setup.</p>
     <div class="cards" id="automation-cards"></div>
   </section>
 
-  <section id="methods" class="methods-section protect-content">
+  <section id="methods" class="methods-section protect-content reveal">
     <h2>New Methods to Simplify Work</h2>
     <div class="methods-grid" id="methods-grid"></div>
   </section>
 
-  <section id="products" class="products-section protect-content">
+  <section id="products" class="products-section protect-content reveal">
     <h2>New Automation Products</h2>
     <div class="products-grid" id="products-grid"></div>
   </section>
 
-  <section id="setup" class="setup hidden">
+  <section id="setup" class="setup hidden reveal">
     <div class="setup-head">
-      <button class="btn btn-ghost" id="back-to-catalog">Back</button>
+      <button class="btn btn-ghost magnetic" id="back-to-catalog">Back</button>
       <h3 id="setup-title">Setup Wizard</h3>
     </div>
 
     <div id="setup-content"></div>
   </section>
 
-  <section id="how-it-works" class="how-grid protect-content">
+  <section id="how-it-works" class="how-grid protect-content reveal">
     <article>
       <h3>1. Select</h3>
       <p>Pick an automation from ready-to-use categories.</p>
@@ -281,7 +290,7 @@ app.innerHTML = `
     </article>
   </section>
 
-  <section id="pricing" class="pricing protect-content">
+  <section id="pricing" class="pricing protect-content reveal">
     <h2>Simple Pricing</h2>
     <div class="pricing-grid">
       <article><h3>Starter</h3><p>999 INR / month</p><small>3 active automations</small></article>
@@ -290,7 +299,7 @@ app.innerHTML = `
     </div>
   </section>
 
-  <button class="chat-toggle" id="chat-toggle">CX Query Assistant</button>
+  <button class="chat-toggle magnetic" id="chat-toggle">CX Query Assistant</button>
 
   <aside class="chatbot hidden" id="chatbot">
     <div class="chatbot-head">
@@ -305,6 +314,9 @@ app.innerHTML = `
       <button type="submit">Send</button>
     </form>
   </aside>
+
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
 `;
 
 const state = {
@@ -323,7 +335,7 @@ const setupContent = document.querySelector('#setup-content');
 function renderCards() {
   cardsContainer.innerHTML = AUTOMATIONS.map(
     (item) => `
-      <button class="card" data-id="${item.id}">
+      <button class="card tilt" data-id="${item.id}">
         <img src="${item.image}" alt="${item.title}" loading="lazy" draggable="false" />
         <div class="card-body">
           <h3>${item.title}</h3>
@@ -336,13 +348,13 @@ function renderCards() {
 }
 
 function renderMethods() {
-  methodsGrid.innerHTML = QUICK_METHODS.map((method) => `<article class="method-item">${method}</article>`).join('');
+  methodsGrid.innerHTML = QUICK_METHODS.map((method) => `<article class="method-item tilt">${method}</article>`).join('');
 }
 
 function renderProducts() {
   productsGrid.innerHTML = NEW_PRODUCTS.map(
     (product) => `
-      <article class="product-item">
+      <article class="product-item tilt">
         <h3>${product.name}</h3>
         <p>${product.detail}</p>
       </article>
@@ -382,7 +394,7 @@ function renderQuestions() {
   setupContent.innerHTML = `
     <form id="wizard-form" class="wizard-form">
       ${fields}
-      <button type="submit" class="btn btn-primary">Generate My Automation</button>
+      <button type="submit" class="btn btn-primary magnetic">Generate My Automation</button>
     </form>
   `;
 
@@ -398,7 +410,7 @@ function renderQuestions() {
 
 function renderGenerating() {
   setupContent.innerHTML = `
-    <div class="progress-wrap">
+    <div class="progress-wrap glass">
       <h4>Creating your automation...</h4>
       <ul>
         <li>Analyzing input</li>
@@ -426,7 +438,7 @@ function renderGenerating() {
       state.currentStep = 'result';
       renderResult();
     }
-  }, 250);
+  }, 220);
 }
 
 function renderResult() {
@@ -452,7 +464,7 @@ function renderResult() {
           <span>Activate 7-day free trial with email</span>
           <input type="email" name="email" placeholder="you@business.com" required />
         </label>
-        <button type="submit" class="btn btn-primary">Start 7-Day Free Trial</button>
+        <button type="submit" class="btn btn-primary magnetic">Start 7-Day Free Trial</button>
       </form>
       <p id="trial-message" class="trial-message"></p>
     </div>
@@ -521,6 +533,105 @@ function initChatbot() {
   });
 }
 
+function initParticles() {
+  const particleRoot = document.querySelector('#particles');
+  if (!particleRoot) return;
+
+  const count = 34;
+  particleRoot.innerHTML = Array.from({ length: count })
+    .map((_, index) => {
+      const size = 2 + Math.round(Math.random() * 4);
+      const left = Math.round(Math.random() * 100);
+      const delay = (Math.random() * 10).toFixed(2);
+      const duration = (12 + Math.random() * 20).toFixed(2);
+      return `<span class="particle" style="--size:${size}px;--left:${left}%;--delay:${delay}s;--duration:${duration}s" data-i="${index}"></span>`;
+    })
+    .join('');
+}
+
+function initRevealObserver() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    },
+    { threshold: 0.18 }
+  );
+
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+}
+
+function initTiltAndMagnetics() {
+  document.querySelectorAll('.tilt').forEach((el) => {
+    el.addEventListener('mousemove', (event) => {
+      const rect = el.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const rx = (py - 0.5) * -8;
+      const ry = (px - 0.5) * 10;
+      el.style.transform = `perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(-5px)`;
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    });
+  });
+
+  document.querySelectorAll('.magnetic').forEach((el) => {
+    el.addEventListener('mousemove', (event) => {
+      const rect = el.getBoundingClientRect();
+      const x = event.clientX - (rect.left + rect.width / 2);
+      const y = event.clientY - (rect.top + rect.height / 2);
+      el.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'translate(0, 0)';
+    });
+  });
+}
+
+function initCursor() {
+  const dot = document.querySelector('#cursor-dot');
+  const ring = document.querySelector('#cursor-ring');
+  if (!dot || !ring) return;
+
+  window.addEventListener('mousemove', (event) => {
+    dot.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
+    ring.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
+  });
+
+  document.querySelectorAll('button, a, .card').forEach((el) => {
+    el.addEventListener('mouseenter', () => ring.classList.add('active'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('active'));
+  });
+}
+
+function initParallaxAndProgress() {
+  const progress = document.querySelector('#scroll-progress');
+  const parallaxItems = document.querySelectorAll('.parallax');
+
+  const onScroll = () => {
+    const scrollTop = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = max > 0 ? Math.min(1, Math.max(0, scrollTop / max)) : 0;
+    if (progress) {
+      progress.style.transform = `scaleX(${ratio})`;
+    }
+
+    parallaxItems.forEach((el) => {
+      const depth = Number(el.dataset.depth || '0.1');
+      el.style.transform = `translateY(${(scrollTop * depth).toFixed(2)}px)`;
+    });
+  };
+
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
 cardsContainer.addEventListener('click', (event) => {
   const card = event.target.closest('.card');
   if (!card) return;
@@ -558,7 +669,7 @@ document.querySelector('#hero-custom-btn').addEventListener('click', () => {
           <option value="crm">CRM</option>
         </select>
       </label>
-      <button type="submit" class="btn btn-primary">Continue</button>
+      <button type="submit" class="btn btn-primary magnetic">Continue</button>
     </form>
     <p id="custom-result" class="trial-message"></p>
   `;
@@ -572,7 +683,6 @@ document.querySelector('#hero-custom-btn').addEventListener('click', () => {
 
   setupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-
 
 function initContentProtection() {
   const isEditable = (el) => el && (el.closest('input, textarea, select, [contenteditable="true"]'));
@@ -621,3 +731,8 @@ renderMethods();
 renderProducts();
 initChatbot();
 initContentProtection();
+initParticles();
+initRevealObserver();
+initTiltAndMagnetics();
+initCursor();
+initParallaxAndProgress();
