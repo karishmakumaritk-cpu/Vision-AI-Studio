@@ -1,44 +1,49 @@
-# Vision AI Studio
+# HerBalance AI Studio
 
-Vite frontend + Render backend setup (without changing your core workflow).
+This repository now implements an MVP frontend for the HerBalance AI product vision.
 
-## Why Vercel shows only one page
+## Implemented user flow
 
-Aapka deploy technically successful ho sakta hai, lekin agar frontend backend se connect nahi kar pa raha
-(CORS/env/api URL issue), to UI static ek page jaisa dikhta rehta hai.
+1. Landing page with product positioning and clear CTA
+2. Automation catalog with 6 click-to-start cards
+3. Setup wizard per automation (3 questions)
+4. Live generation screen with progress bar
+5. Result preview with sample outputs
+6. Trial activation form (email capture)
+7. Custom automation request form
+8. Pricing section (Starter, Pro, Business)
 
-## What is configured now
+## Tech stack in this repo
 
-- Frontend default API base: `/api`
-- `vercel.json` rewrite: `/api/*` -> `https://vision-ai-studio-backend.onrender.com/*`
-- Optional env override: `VITE_BACKEND_URL`
-- Frontend status box + response preview for quick debugging
+- Vite frontend (plain JavaScript)
+- Deployment config for Vercel (`vercel.json`)
+- Optional GitHub Pages compatibility (`vite.config.js`)
 
-## Vercel settings
-
-- Framework: `Vite`
-- Root: `./`
-- Install: `npm install`
-- Build: `npm run build`
-- Output: `dist`
-
-(Optional) Environment variable:
-
-```env
-VITE_BACKEND_URL=https://vision-ai-studio-backend.onrender.com
-```
-
-## Render backend checklist
-
-- `PORT` se listen karna (already visible in logs)
-- `/health` route add/verify karo
-- CORS allow origins:
-  - your Vercel domain
-  - local dev (`http://localhost:5173`)
-
-## Local run
+## Local development
 
 ```bash
 npm install
 npm run dev
 ```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Vercel deployment
+
+- Framework preset: Vite
+- Root directory: `./`
+- Install command: `npm install`
+- Build command: `npm run build`
+- Output directory: `dist`
+
+## Next backend integration steps
+
+1. Replace trial form handler with API call: `POST /api/trials/start`
+2. Persist automations using `POST /api/automations/create`
+3. Read generated previews from backend response instead of static sample arrays
+4. Connect billing action to Razorpay checkout endpoint
+5. Add authentication and dashboard routes
