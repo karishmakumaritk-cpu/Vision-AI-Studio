@@ -307,7 +307,7 @@ app.innerHTML = `
       <button id="chat-close" aria-label="Close chat">Close</button>
     </div>
     <div class="chatbot-body" id="chatbot-body">
-      <div class="bot-msg">Share your query. I can help with setup, plans, trial, and automation flow questions.</div>
+      <div class="bot-msg">Hi, I am AI Assistant. Share your query and I can help with setup, plans, trial, and automation flow questions.</div>
     </div>
     <form id="chat-form" class="chatbot-form">
       <input type="text" id="chat-input" placeholder="Type your query" required />
