@@ -157,6 +157,51 @@ const AUTOMATIONS = [
   }
 ];
 
+const QUICK_METHODS = [
+  'One click setup templates for non-technical teams',
+  'Reusable workflow presets for faster launches',
+  'Auto-generated task checklists for each automation',
+  'Performance snapshots to compare automation outcomes'
+];
+
+const NEW_PRODUCTS = [
+  {
+    name: 'Lead Follow-up Accelerator',
+    detail: 'Auto sequence for new leads across email and messaging channels.'
+  },
+  {
+    name: 'Review Response Engine',
+    detail: 'Detects new reviews and drafts response suggestions automatically.'
+  },
+  {
+    name: 'Inventory Alert Pilot',
+    detail: 'Tracks stock thresholds and prepares reorder notifications.'
+  }
+];
+
+const FAQ_BOT_KB = [
+  {
+    keywords: ['price', 'pricing', 'plan', 'cost'],
+    answer:
+      'Current plans are Starter 999 INR, Pro 2,999 INR, and Business 9,999 INR per month. You can start with the trial and upgrade later.'
+  },
+  {
+    keywords: ['trial', 'free trial'],
+    answer:
+      'The platform provides a 7-day free trial. You can activate from any automation result screen using your email.'
+  },
+  {
+    keywords: ['setup', 'start', 'automation'],
+    answer:
+      'Choose an automation card, answer three setup questions, then click Generate My Automation. A preview is shown before activation.'
+  },
+  {
+    keywords: ['support', 'help', 'issue', 'query'],
+    answer:
+      'For query resolution, share your issue in the chat and include your automation name. For account-level help, contact support via dashboard after login.'
+  }
+];
+
 const app = document.querySelector('#app');
 
 app.innerHTML = `
@@ -164,7 +209,8 @@ app.innerHTML = `
     <div class="brand">HerBalance AI</div>
     <nav>
       <a href="#catalog">Automations</a>
-      <a href="#how-it-works">How it works</a>
+      <a href="#methods">Methods</a>
+      <a href="#products">Products</a>
       <a href="#pricing">Pricing</a>
       <button class="btn btn-secondary" id="header-trial-btn">Start Free Trial</button>
     </nav>
@@ -201,6 +247,16 @@ app.innerHTML = `
     <div class="cards" id="automation-cards"></div>
   </section>
 
+  <section id="methods" class="methods-section">
+    <h2>New Methods to Simplify Work</h2>
+    <div class="methods-grid" id="methods-grid"></div>
+  </section>
+
+  <section id="products" class="products-section">
+    <h2>New Automation Products</h2>
+    <div class="products-grid" id="products-grid"></div>
+  </section>
+
   <section id="setup" class="setup hidden">
     <div class="setup-head">
       <button class="btn btn-ghost" id="back-to-catalog">Back</button>
@@ -233,6 +289,22 @@ app.innerHTML = `
       <article><h3>Business</h3><p>9,999 INR / month</p><small>Unlimited automations</small></article>
     </div>
   </section>
+
+  <button class="chat-toggle" id="chat-toggle">CX Query Assistant</button>
+
+  <aside class="chatbot hidden" id="chatbot">
+    <div class="chatbot-head">
+      <strong>CX Query Assistant</strong>
+      <button id="chat-close" aria-label="Close chat">Close</button>
+    </div>
+    <div class="chatbot-body" id="chatbot-body">
+      <div class="bot-msg">Share your query. I can help with setup, plans, trial, and automation flow questions.</div>
+    </div>
+    <form id="chat-form" class="chatbot-form">
+      <input type="text" id="chat-input" placeholder="Type your query" required />
+      <button type="submit">Send</button>
+    </form>
+  </aside>
 `;
 
 const state = {
@@ -242,6 +314,8 @@ const state = {
 };
 
 const cardsContainer = document.querySelector('#automation-cards');
+const methodsGrid = document.querySelector('#methods-grid');
+const productsGrid = document.querySelector('#products-grid');
 const setupSection = document.querySelector('#setup');
 const setupTitle = document.querySelector('#setup-title');
 const setupContent = document.querySelector('#setup-content');
@@ -257,6 +331,21 @@ function renderCards() {
           <span>Set up in 60 seconds</span>
         </div>
       </button>
+    `
+  ).join('');
+}
+
+function renderMethods() {
+  methodsGrid.innerHTML = QUICK_METHODS.map((method) => `<article class="method-item">${method}</article>`).join('');
+}
+
+function renderProducts() {
+  productsGrid.innerHTML = NEW_PRODUCTS.map(
+    (product) => `
+      <article class="product-item">
+        <h3>${product.name}</h3>
+        <p>${product.detail}</p>
+      </article>
     `
   ).join('');
 }
@@ -390,6 +479,48 @@ function openSetup(automationId) {
   renderQuestions();
 }
 
+function findBotAnswer(userText) {
+  const text = userText.toLowerCase();
+  const match = FAQ_BOT_KB.find((entry) => entry.keywords.some((keyword) => text.includes(keyword)));
+  if (match) return match.answer;
+  return 'I can help with pricing, trial, setup, and support queries. Please share your exact issue and selected automation.';
+}
+
+function appendChatMessage(type, text) {
+  const container = document.querySelector('#chatbot-body');
+  const el = document.createElement('div');
+  el.className = type === 'user' ? 'user-msg' : 'bot-msg';
+  el.textContent = text;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+function initChatbot() {
+  const toggle = document.querySelector('#chat-toggle');
+  const panel = document.querySelector('#chatbot');
+  const close = document.querySelector('#chat-close');
+  const form = document.querySelector('#chat-form');
+  const input = document.querySelector('#chat-input');
+
+  toggle.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+  });
+
+  close.addEventListener('click', () => {
+    panel.classList.add('hidden');
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendChatMessage('user', message);
+    appendChatMessage('bot', findBotAnswer(message));
+    input.value = '';
+  });
+}
+
 cardsContainer.addEventListener('click', (event) => {
   const card = event.target.closest('.card');
   if (!card) return;
@@ -443,3 +574,6 @@ document.querySelector('#hero-custom-btn').addEventListener('click', () => {
 });
 
 renderCards();
+renderMethods();
+renderProducts();
+initChatbot();
