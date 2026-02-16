@@ -216,7 +216,7 @@ app.innerHTML = `
     </nav>
   </header>
 
-  <section class="hero">
+  <section class="hero protect-content">
     <div>
       <p class="eyebrow">Select. Click. Automate. Done in 60 seconds.</p>
       <h1>Stop doing repetitive tasks. Let AI handle them.</h1>
@@ -232,27 +232,27 @@ app.innerHTML = `
     <div class="hero-visual">
       <img
         src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1400&q=80&auto=format&fit=crop"
-        alt="Automation dashboard preview"
+        alt="Automation dashboard preview" draggable="false"
       />
     </div>
   </section>
 
-  <section class="logo-strip">
+  <section class="logo-strip protect-content">
     <p>Designed for growing brands, agencies, and online businesses.</p>
   </section>
 
-  <section id="catalog" class="catalog-section">
+  <section id="catalog" class="catalog-section protect-content">
     <h2>Automation Catalog</h2>
     <p>Choose one automation to start instant setup.</p>
     <div class="cards" id="automation-cards"></div>
   </section>
 
-  <section id="methods" class="methods-section">
+  <section id="methods" class="methods-section protect-content">
     <h2>New Methods to Simplify Work</h2>
     <div class="methods-grid" id="methods-grid"></div>
   </section>
 
-  <section id="products" class="products-section">
+  <section id="products" class="products-section protect-content">
     <h2>New Automation Products</h2>
     <div class="products-grid" id="products-grid"></div>
   </section>
@@ -266,7 +266,7 @@ app.innerHTML = `
     <div id="setup-content"></div>
   </section>
 
-  <section id="how-it-works" class="how-grid">
+  <section id="how-it-works" class="how-grid protect-content">
     <article>
       <h3>1. Select</h3>
       <p>Pick an automation from ready-to-use categories.</p>
@@ -281,7 +281,7 @@ app.innerHTML = `
     </article>
   </section>
 
-  <section id="pricing" class="pricing">
+  <section id="pricing" class="pricing protect-content">
     <h2>Simple Pricing</h2>
     <div class="pricing-grid">
       <article><h3>Starter</h3><p>999 INR / month</p><small>3 active automations</small></article>
@@ -324,7 +324,7 @@ function renderCards() {
   cardsContainer.innerHTML = AUTOMATIONS.map(
     (item) => `
       <button class="card" data-id="${item.id}">
-        <img src="${item.image}" alt="${item.title}" loading="lazy" />
+        <img src="${item.image}" alt="${item.title}" loading="lazy" draggable="false" />
         <div class="card-body">
           <h3>${item.title}</h3>
           <p>${item.description}</p>
@@ -573,7 +573,51 @@ document.querySelector('#hero-custom-btn').addEventListener('click', () => {
   setupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
+
+function initContentProtection() {
+  const isEditable = (el) => el && (el.closest('input, textarea, select, [contenteditable="true"]'));
+
+  document.addEventListener('contextmenu', (event) => {
+    if (event.target.closest('.protect-content')) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('copy', (event) => {
+    if (!isEditable(event.target) && event.target.closest('.protect-content')) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('cut', (event) => {
+    if (!isEditable(event.target) && event.target.closest('.protect-content')) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('selectstart', (event) => {
+    if (!isEditable(event.target) && event.target.closest('.protect-content')) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('dragstart', (event) => {
+    if (event.target.closest('.protect-content')) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (!event.target.closest('.protect-content') || isEditable(event.target)) return;
+    const key = event.key.toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && (key === 'c' || key === 'x' || key === 'u' || key === 's' || key === 'p')) {
+      event.preventDefault();
+    }
+  });
+}
+
 renderCards();
 renderMethods();
 renderProducts();
 initChatbot();
+initContentProtection();

@@ -47,3 +47,8 @@ npm run build
 - Install command: `npm install`
 - Build command: `npm run build`
 - Output directory: `dist`
+
+## Content protection note
+
+Basic front-end content protection is enabled for static sections (disable right-click, copy, cut, drag, and common copy/save shortcuts).
+This prevents casual copying but no browser-only method can guarantee 100% protection against advanced users.
