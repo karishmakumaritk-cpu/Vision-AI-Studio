@@ -1,5 +1,7 @@
-const supabase = require('../config/db');
 const { sendTrialExpiryEmail } = require('../utils/email');
+const store = require('../storage/inMemoryStore');
+
+const { users, automations } = store;
 
 // Check expired trials (runs daily via cron)
 exports.checkExpiredTrials = async () => {
@@ -7,37 +9,35 @@ exports.checkExpiredTrials = async () => {
     const now = new Date().toISOString();
 
     // Find users with expired trials
-    const { data: expiredUsers, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('plan', 'free_trial')
-      .lt('trial_end', now)
-      .eq('status', 'active');
+    const expiredUsers = users.filter((user) => (
+      user.plan === 'free_trial'
+      && user.status === 'active'
+      && user.trial_end
+      && new Date(user.trial_end).toISOString() < now
+    ));
 
-    if (error) throw error;
+    console.log(`⏰ Found ${expiredUsers.length} expired trials`);
 
-    console.log(`⏰ Found ${expiredUsers?.length || 0} expired trials`);
-
-    if (!expiredUsers || expiredUsers.length === 0) {
+    if (expiredUsers.length === 0) {
       return { success: true, count: 0 };
     }
 
     // Update each user
     for (const user of expiredUsers) {
       // Update user status
-      await supabase
-        .from('users')
-        .update({ status: 'trial_expired' })
-        .eq('id', user.id);
+      user.status = 'trial_expired';
+      user.updated_at = new Date().toISOString();
 
       // Pause their automations
-      await supabase
-        .from('automations')
-        .update({ status: 'paused' })
-        .eq('user_id', user.id);
+      automations
+        .filter((automation) => automation.user_id === user.id)
+        .forEach((automation) => {
+          automation.status = 'paused';
+          automation.updated_at = new Date().toISOString();
+        });
 
-      // Send expiry email
-      await sendTrialExpiryEmail(user.email, user.name);
+      // Send expiry email (non-blocking)
+      sendTrialExpiryEmail(user.email, user.name).catch(() => {});
 
       console.log(`✅ Trial expired for: ${user.email}`);
     }
@@ -54,13 +54,7 @@ exports.getTrialStatus = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('trial_start, trial_end, status, plan')
-      .eq('id', userId)
-      .single();
-
-    if (error) throw error;
+    const user = users.find((entry) => entry.id === userId);
 
     if (!user) {
       return res.status(404).json({
@@ -70,8 +64,10 @@ exports.getTrialStatus = async (req, res) => {
     }
 
     const now = new Date();
-    const trialEnd = new Date(user.trial_end);
-    const daysRemaining = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+    const trialEnd = user.trial_end ? new Date(user.trial_end) : null;
+    const daysRemaining = trialEnd
+      ? Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24))
+      : 0;
 
     res.json({
       success: true,
@@ -95,12 +91,9 @@ exports.getTrialStatus = async (req, res) => {
 // Get all users (admin)
 exports.getAllUsers = async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const data = [...users].sort(
+      (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    );
 
     res.json({
       success: true,
