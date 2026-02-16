@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, MessageCircle, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Contact = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,11 +12,73 @@ const Contact = () => {
     service: '',
     message: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    alert('Thanks for reaching out! We\'ll get back to you within 24 hours.');
+    setLoading(true);
+    setSubmitStatus(null);
+
+    try {
+      // Build the request payload
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '',
+        business_type: formData.service || '', // Map service to business_type
+        service_interest: formData.service || '',
+        message: formData.message,
+      };
+
+      // Call the backend API
+      const response = await fetch(
+        'http://localhost:5000/api/leads/create',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Success
+        setSubmitStatus({
+          type: 'success',
+          message: 'Welcome! Redirecting to your dashboard...',
+        });
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          service: '',
+          message: '',
+        });
+        // Redirect to dashboard after 1.5 seconds
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      } else {
+        // API error
+        setSubmitStatus({
+          type: 'error',
+          message: data.message || 'Failed to submit form. Please try again.',
+        });
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection and try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactMethods = [
@@ -220,14 +284,29 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-glow-lg hover:scale-105 transition-all flex items-center justify-center gap-2"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-glow-lg hover:scale-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Message
-                <Send className="w-5 h-5" />
+                {loading ? 'Submitting...' : 'Send Message'}
+                {!loading && <Send className="w-5 h-5" />}
               </button>
 
+              {submitStatus && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-4 rounded-xl text-center font-semibold ${
+                    submitStatus.type === 'success'
+                      ? 'bg-green-50 text-green-700 border-2 border-green-200'
+                      : 'bg-red-50 text-red-700 border-2 border-red-200'
+                  }`}
+                >
+                  {submitStatus.message}
+                </motion.div>
+              )}
+
               <p className="text-sm text-gray-500 text-center">
-                We typically respond within 24 hours
+                {!submitStatus ? 'We typically respond within 24 hours' : 'Check your email for next steps'}
               </p>
             </form>
           </motion.div>
