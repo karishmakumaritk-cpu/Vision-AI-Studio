@@ -1,0 +1,113 @@
+{
+  "name": "WhatsApp Auto Reply (Demo Mode)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-message",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - WhatsApp Message",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": "users",
+        "where": {
+          "conditions": [
+            {
+              "column": "id",
+              "value": "={{$json[\"user_id\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "Check User Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"status\"]}}",
+              "value2": "active"
+            }
+          ]
+        }
+      },
+      "name": "Is Active User?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Thanks for your message! Our AI will respond shortly. (Demo Mode)"
+      },
+      "name": "Send Auto Reply",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "automation_logs",
+        "columns": {
+          "mappings": [
+            {
+              "column": "user_id",
+              "value": "={{$json[\"user_id\"]}}"
+            },
+            {
+              "column": "action_type",
+              "value": "whatsapp_reply_sent"
+            },
+            {
+              "column": "details",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        }
+      },
+      "name": "Log Activity",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Trial expired. Please upgrade to continue."
+      },
+      "name": "Trial Expired Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - WhatsApp Message": {
+      "main": [[{"node": "Check User Status", "type": "main", "index": 0}]]
+    },
+    "Check User Status": {
+      "main": [[{"node": "Is Active User?", "type": "main", "index": 0}]]
+    },
+    "Is Active User?": {
+      "main": [
+        [{"node": "Send Auto Reply", "type": "main", "index": 0}],
+        [{"node": "Trial Expired Response", "type": "main", "index": 0}]
+      ]
+    },
+    "Send Auto Reply": {
+      "main": [[{"node": "Log Activity", "type": "main", "index": 0}]]
+    }
+  }
+}

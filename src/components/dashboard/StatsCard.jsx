@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatsCard = ({ title, value, change, icon: Icon, color = 'purple', delay = 0 }) => {
+const StatsCard = ({ title, value, change, icon: Icon, color = 'primary', delay = 0 }) => {
   const isPositive = change >= 0;
-  
+
   const colorClasses = {
-    purple: 'from-purple-500 to-purple-600',
-    pink: 'from-pink-500 to-pink-600',
+    primary: 'from-primary-500 to-primary-600',
+    secondary: 'from-secondary-500 to-secondary-600',
     success: 'from-green-500 to-green-600',
     warning: 'from-orange-500 to-orange-600',
     danger: 'from-red-500 to-red-600',
@@ -25,7 +25,9 @@ const StatsCard = ({ title, value, change, icon: Icon, color = 'purple', delay =
           <p className="text-sm text-gray-600 mb-1">{title}</p>
           <h3 className="text-3xl font-black text-gray-900">{value}</h3>
         </div>
-        <div className={`w-12 h-12 bg-gradient-to-br ${colorClasses[color]} rounded-xl flex items-center justify-center flex-shrink-0`}>
+        <div
+          className={`w-12 h-12 bg-gradient-to-br ${colorClasses[color]} rounded-xl flex items-center justify-center flex-shrink-0`}
+        >
           <Icon className="w-6 h-6 text-white" />
         </div>
       </div>
