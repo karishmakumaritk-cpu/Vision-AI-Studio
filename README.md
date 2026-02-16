@@ -19,7 +19,7 @@ This repository implements an MVP frontend for the Vision AI product vision.
 - Previous website layout/design is preserved
 - New automation-focused methods section added
 - New automation products section added
-- Free CX Query Assistant chatbot added (rule-based, no paid API)
+- Free AI Assistant chatbot added (rule-based, no paid API)
 - Premium visual effects added without changing flow: particle background, parallax hero, tilt cards, magnetic CTA buttons, reveal-on-scroll sections, and custom cursor
 
 ## Tech stack in this repo

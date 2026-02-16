@@ -215,7 +215,7 @@ app.innerHTML = `
   <div class="progress-track"><div id="scroll-progress" class="progress-line"></div></div>
 
   <header class="topbar glass">
-    <div class="brand">Vision AI</div>
+    <div class="brand"><span class="brand-orbit" aria-hidden="true">◉</span><span class="brand-text">Vision-AI-Studio</span></div>
     <nav>
       <a href="#catalog">Automations</a>
       <a href="#methods">Methods</a>
@@ -299,11 +299,11 @@ app.innerHTML = `
     </div>
   </section>
 
-  <button class="chat-toggle magnetic" id="chat-toggle">CX Query Assistant</button>
+  <button class="chat-toggle magnetic" id="chat-toggle">AI Assistant</button>
 
   <aside class="chatbot hidden" id="chatbot">
     <div class="chatbot-head">
-      <strong>CX Query Assistant</strong>
+      <strong>AI Assistant</strong>
       <button id="chat-close" aria-label="Close chat">Close</button>
     </div>
     <div class="chatbot-body" id="chatbot-body">

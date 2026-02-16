@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vision AI</title>
+    <title>Vision-AI-Studio</title>
     <script type="module" src="/src/main.js"></script>
     <style>
       :root {
@@ -148,9 +148,44 @@
       }
 
       .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
         font-weight: 800;
         letter-spacing: 0.4px;
         font-size: 1.04rem;
+      }
+
+      .brand-text {
+        display: inline-block;
+        background: linear-gradient(90deg, #f8fafc, #a5b4fc, #67e8f9, #f8fafc);
+        background-size: 220% 220%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: cinematicGlow 2.8s ease-out forwards;
+      }
+
+      .brand-orbit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.1rem;
+        height: 1.1rem;
+        color: #a78bfa;
+        transform-origin: 50% 50%;
+        animation: cinematicSpinStop 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes cinematicSpinStop {
+        0% { transform: rotate(0deg) scale(0.8); opacity: 0.4; }
+        70% { transform: rotate(1080deg) scale(1.08); opacity: 1; }
+        100% { transform: rotate(1080deg) scale(1); opacity: 1; }
+      }
+
+      @keyframes cinematicGlow {
+        0% { background-position: 0% 50%; opacity: 0.5; letter-spacing: 0.3px; }
+        100% { background-position: 100% 50%; opacity: 1; letter-spacing: 0.5px; }
       }
 
       nav {
