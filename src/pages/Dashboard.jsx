@@ -1,172 +1,160 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Bot, MessageSquare, TrendingUp, Users } from 'lucide-react';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import TrialBanner from '../components/dashboard/TrialBanner';
 import StatsCard from '../components/dashboard/StatsCard';
 import AutomationCard from '../components/dashboard/AutomationCard';
 import DemoDataViewer from '../components/dashboard/DemoDataViewer';
-import { 
-  Bot, 
-  MessageSquare, 
-  TrendingUp, 
-  Users,
-  Zap,
-  Sparkles
-} from 'lucide-react';
-import { dashboardAPI } from '../utils/api';
+import UsageChart from '../components/dashboard/UsageChart';
+import QuickActions from '../components/dashboard/QuickActions';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
   const [trialStatus, setTrialStatus] = useState(null);
   const [automations, setAutomations] = useState([]);
   const [demoData, setDemoData] = useState([]);
   const [stats, setStats] = useState(null);
 
-  // Mock User ID (in production, get from auth context)
-  const userId = 'demo-user-123';
-
   useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+
+      try {
+        // Mock data for initial dashboard experience
+        setTrialStatus({
+          days_remaining: 5,
+          trial_end: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          is_expired: false,
+        });
+
+        setAutomations([
+          {
+            id: '1',
+            automation_type: 'whatsapp_chatbot',
+            status: 'active',
+            usage_count: 34,
+            usage_limit: 50,
+            config: { demo_mode: true },
+          },
+          {
+            id: '2',
+            automation_type: 'ai_voice_agent',
+            status: 'active',
+            usage_count: 12,
+            usage_limit: 50,
+            config: { demo_mode: true },
+          },
+          {
+            id: '3',
+            automation_type: 'instagram_automation',
+            status: 'paused',
+            usage_count: 8,
+            usage_limit: 50,
+            config: { demo_mode: true },
+          },
+        ]);
+
+        setDemoData([
+          {
+            data_type: 'whatsapp_chatbot',
+            data: {
+              sample_messages: [
+                {
+                  from: 'Customer A',
+                  message: 'What are your prices?',
+                  reply: 'Auto-replied with pricing details',
+                  timestamp: new Date(),
+                },
+                {
+                  from: 'Customer B',
+                  message: 'Is this available?',
+                  reply: 'Checked inventory and confirmed',
+                  timestamp: new Date(),
+                },
+              ],
+              sample_analytics: {
+                messages_handled: 45,
+                response_time: '2.3s',
+                satisfaction: '94%',
+              },
+            },
+          },
+          {
+            data_type: 'ai_voice_agent',
+            data: {
+              sample_calls: [
+                {
+                  caller: '+91 98765 43210',
+                  duration: '3:24',
+                  status: 'Resolved',
+                  timestamp: new Date(),
+                },
+                {
+                  caller: '+91 98765 43211',
+                  duration: '1:45',
+                  status: 'Transferred',
+                  timestamp: new Date(),
+                },
+              ],
+              sample_analytics: {
+                calls_handled: 28,
+                avg_duration: '2:45',
+                resolution: '89%',
+              },
+            },
+          },
+          {
+            data_type: 'instagram_automation',
+            data: {
+              sample_posts: [
+                {
+                  type: 'Reel',
+                  caption: 'Five ways AI can transform your business',
+                  hashtags: '#ai #business #automation #growth',
+                  engagement: '245 likes',
+                },
+                {
+                  type: 'Post',
+                  caption: 'Automate your way to success with HerBalance AI',
+                  hashtags: '#automation #saas #tech',
+                  engagement: '189 likes',
+                },
+              ],
+              sample_analytics: {
+                posts_created: 12,
+                engagement: '8.4%',
+                growth: '+156',
+              },
+            },
+          },
+        ]);
+
+        setStats({
+          total_automations: 3,
+          messages_handled: 127,
+          growth_rate: 24,
+          active_leads: 18,
+        });
+      } catch (error) {
+        console.error('Load dashboard error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-
-      // In production, make real API calls
-      // For now, using mock data
-      
-      // Mock Trial Status
-      setTrialStatus({
-        days_remaining: 5,
-        trial_end: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        is_expired: false
-      });
-
-      // Mock Automations
-      setAutomations([
-        {
-          id: '1',
-          automation_type: 'whatsapp_chatbot',
-          status: 'active',
-          usage_count: 34,
-          usage_limit: 50,
-          config: { demo_mode: true }
-        },
-        {
-          id: '2',
-          automation_type: 'ai_voice_agent',
-          status: 'active',
-          usage_count: 12,
-          usage_limit: 50,
-          config: { demo_mode: true }
-        },
-        {
-          id: '3',
-          automation_type: 'instagram_automation',
-          status: 'paused',
-          usage_count: 8,
-          usage_limit: 50,
-          config: { demo_mode: true }
-        }
-      ]);
-
-      // Mock Demo Data
-      setDemoData([
-        {
-          data_type: 'whatsapp_chatbot',
-          data: {
-            sample_messages: [
-              { 
-                from: 'Customer A', 
-                message: 'What are your prices?', 
-                reply: 'Auto-replied with pricing details', 
-                timestamp: new Date() 
-              },
-              { 
-                from: 'Customer B', 
-                message: 'Is this available?', 
-                reply: 'Checked inventory and confirmed', 
-                timestamp: new Date() 
-              }
-            ],
-            sample_analytics: {
-              messages_handled: 45,
-              response_time: '2.3s',
-              satisfaction: '94%'
-            }
-          }
-        },
-        {
-          data_type: 'ai_voice_agent',
-          data: {
-            sample_calls: [
-              { caller: '+91 98765 43210', duration: '3:24', status: 'Resolved', timestamp: new Date() },
-              { caller: '+91 98765 43211', duration: '1:45', status: 'Transferred', timestamp: new Date() }
-            ],
-            sample_analytics: {
-              calls_handled: 28,
-              avg_duration: '2:45',
-              resolution: '89%'
-            }
-          }
-        },
-        {
-          data_type: 'instagram_automation',
-          data: {
-            sample_posts: [
-              { 
-                type: 'Reel', 
-                caption: '5 ways AI can transform your business! 🚀', 
-                hashtags: '#ai #business #automation #growth', 
-                engagement: '245 likes' 
-              },
-              { 
-                type: 'Post', 
-                caption: 'Automate your way to success with HerBalance AI 💜', 
-                hashtags: '#automation #saas #tech', 
-                engagement: '189 likes' 
-              }
-            ],
-            sample_analytics: {
-              posts_created: 12,
-              engagement: '8.4%',
-              growth: '+156'
-            }
-          }
-        }
-      ]);
-
-      // Mock Stats
-      setStats({
-        total_automations: 3,
-        messages_handled: 127,
-        growth_rate: 24,
-        active_leads: 18
-      });
-
-    } catch (error) {
-      console.error('Load dashboard error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleToggleAutomation = async (automationId, newStatus) => {
     try {
-      // Update local state
-      setAutomations(prev =>
-        prev.map(auto =>
+      setAutomations((prev) =>
+        prev.map((auto) =>
           auto.id === automationId
             ? { ...auto, status: newStatus ? 'active' : 'paused' }
             : auto
         )
       );
-
-      // In production, call API to update
-      // await dashboardAPI.toggleAutomation(automationId, newStatus);
-      
     } catch (error) {
       console.error('Toggle automation error:', error);
     }
@@ -176,7 +164,7 @@ const Dashboard = () => {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
         </div>
       </DashboardLayout>
     );
@@ -185,21 +173,19 @@ const Dashboard = () => {
   return (
     <DashboardLayout activeTab="overview">
       <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
           <h1 className="text-3xl font-black text-gray-900 mb-2">
-            Welcome to Your AI Dashboard 👋
+            Welcome to Your AI Dashboard
           </h1>
           <p className="text-gray-600">
             Manage your automations, track performance, and grow your business
           </p>
         </motion.div>
 
-        {/* Trial Banner */}
         {trialStatus && !trialStatus.is_expired && (
           <TrialBanner
             daysRemaining={trialStatus.days_remaining}
@@ -207,14 +193,13 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
             title="Active Automations"
             value={stats?.total_automations || 0}
             change={12}
             icon={Bot}
-            color="purple"
+            color="primary"
             delay={0}
           />
           <StatsCard
@@ -222,7 +207,7 @@ const Dashboard = () => {
             value={stats?.messages_handled || 0}
             change={24}
             icon={MessageSquare}
-            color="pink"
+            color="secondary"
             delay={0.1}
           />
           <StatsCard
@@ -243,31 +228,33 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 mb-8 text-white"
-        >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">Get Started with AI Automation</h3>
-                <p className="text-white/90 text-sm">Watch our 5-minute tutorial to maximize your trial</p>
-              </div>
-            </div>
-            <button className="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-2xl transition-all hover:scale-105 flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              Watch Tutorial
-            </button>
-          </div>
-        </motion.div>
+        <QuickActions />
 
-        {/* Automations Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 my-8">
+          <div className="lg:col-span-2">
+            <UsageChart
+              data={[
+                { label: 'Mon', value: 12 },
+                { label: 'Tue', value: 18 },
+                { label: 'Wed', value: 10 },
+                { label: 'Thu', value: 22 },
+                { label: 'Fri', value: 16 },
+                { label: 'Sat', value: 8 },
+                { label: 'Sun', value: 14 },
+              ]}
+            />
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Trial Usage Summary</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              You are on the free trial plan with a limit of 50 actions per automation.
+            </p>
+            <div className="text-sm text-gray-500">
+              Upgrade to unlock higher limits and advanced analytics.
+            </div>
+          </div>
+        </div>
+
         <div className="mb-8">
           <h2 className="text-2xl font-black text-gray-900 mb-6">Your Active Automations</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -282,7 +269,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Demo Data Section */}
         <div>
           <h2 className="text-2xl font-black text-gray-900 mb-6">Demo Performance Data</h2>
           <div className="grid gap-6">

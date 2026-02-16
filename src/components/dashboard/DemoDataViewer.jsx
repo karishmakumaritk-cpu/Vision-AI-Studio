@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MessageSquare, Phone, Instagram, TrendingUp } from 'lucide-react';
+import { MessageSquare, Phone, Instagram } from 'lucide-react';
 
 const DemoDataViewer = ({ demoData, type }) => {
   if (!demoData) {
@@ -10,7 +10,6 @@ const DemoDataViewer = ({ demoData, type }) => {
     );
   }
 
-  // WhatsApp Demo Data
   if (type === 'whatsapp_chatbot') {
     return (
       <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
@@ -24,7 +23,6 @@ const DemoDataViewer = ({ demoData, type }) => {
           </div>
         </div>
 
-        {/* Sample Messages */}
         <div className="space-y-4 mb-6">
           {demoData.sample_messages?.map((msg, idx) => (
             <motion.div
@@ -50,11 +48,10 @@ const DemoDataViewer = ({ demoData, type }) => {
           ))}
         </div>
 
-        {/* Analytics */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
           {Object.entries(demoData.sample_analytics || {}).map(([key, value], idx) => (
             <div key={idx} className="text-center">
-              <div className="text-2xl font-black text-purple-600">{value}</div>
+              <div className="text-2xl font-black text-primary-600">{value}</div>
               <div className="text-xs text-gray-600 capitalize">{key.replace(/_/g, ' ')}</div>
             </div>
           ))}
@@ -63,7 +60,6 @@ const DemoDataViewer = ({ demoData, type }) => {
     );
   }
 
-  // Voice Agent Demo Data
   if (type === 'ai_voice_agent') {
     return (
       <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
@@ -77,7 +73,6 @@ const DemoDataViewer = ({ demoData, type }) => {
           </div>
         </div>
 
-        {/* Sample Calls */}
         <div className="space-y-3 mb-6">
           {demoData.sample_calls?.map((call, idx) => (
             <motion.div
@@ -100,9 +95,7 @@ const DemoDataViewer = ({ demoData, type }) => {
               </div>
               <div className="text-right">
                 <div className="text-sm font-semibold text-gray-900">{call.duration}</div>
-                <div className={`text-xs ${
-                  call.status === 'Resolved' ? 'text-green-600' : 'text-orange-600'
-                }`}>
+                <div className={`text-xs ${call.status === 'Resolved' ? 'text-green-600' : 'text-orange-600'}`}>
                   {call.status}
                 </div>
               </div>
@@ -110,7 +103,6 @@ const DemoDataViewer = ({ demoData, type }) => {
           ))}
         </div>
 
-        {/* Analytics */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
           {Object.entries(demoData.sample_analytics || {}).map(([key, value], idx) => (
             <div key={idx} className="text-center">
@@ -123,7 +115,6 @@ const DemoDataViewer = ({ demoData, type }) => {
     );
   }
 
-  // Instagram Demo Data
   if (type === 'instagram_automation') {
     return (
       <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
@@ -137,7 +128,6 @@ const DemoDataViewer = ({ demoData, type }) => {
           </div>
         </div>
 
-        {/* Sample Posts */}
         <div className="space-y-4 mb-6">
           {demoData.sample_posts?.map((post, idx) => (
             <motion.div
@@ -154,12 +144,11 @@ const DemoDataViewer = ({ demoData, type }) => {
                 <span className="text-sm text-gray-600">{post.engagement}</span>
               </div>
               <p className="text-sm text-gray-800 mb-2">{post.caption}</p>
-              <p className="text-xs text-purple-600">{post.hashtags}</p>
+              <p className="text-xs text-primary-600">{post.hashtags}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Analytics */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
           {Object.entries(demoData.sample_analytics || {}).map(([key, value], idx) => (
             <div key={idx} className="text-center">

@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, MessageCircle, Calendar } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const Contact = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,43 +13,42 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setLoading(true);
     setSubmitStatus(null);
 
     try {
-      // Build the request payload
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const payload = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone || '',
-        business_type: formData.service || '', // Map service to business_type
+        business_type: '',
         service_interest: formData.service || '',
         message: formData.message,
       };
 
-      // Call the backend API
-      const response = await fetch(
-        'http://localhost:5000/api/leads/create',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${apiUrl}/leads/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
 
-      if (data.success) {
-        // Success
+      if (response.ok && data.success) {
         setSubmitStatus({
           type: 'success',
-          message: 'Welcome! Redirecting to your dashboard...',
+          message: data.message || 'Thanks for reaching out. We will contact you soon.',
         });
-        // Reset form
         setFormData({
           name: '',
           email: '',
@@ -59,12 +56,7 @@ const Contact = () => {
           service: '',
           message: '',
         });
-        // Redirect to dashboard after 1.5 seconds
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
       } else {
-        // API error
         setSubmitStatus({
           type: 'error',
           message: data.message || 'Failed to submit form. Please try again.',
@@ -74,7 +66,7 @@ const Contact = () => {
       console.error('Submit error:', error);
       setSubmitStatus({
         type: 'error',
-        message: 'Network error. Please check your connection and try again.',
+        message: 'Unable to reach the server. Please try again shortly.',
       });
     } finally {
       setLoading(false);
@@ -213,11 +205,13 @@ const Contact = () => {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors"
                   placeholder="Enter your name"
+                  disabled={loading}
                 />
               </div>
 
@@ -227,11 +221,13 @@ const Contact = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors"
                   placeholder="your@email.com"
+                  disabled={loading}
                 />
               </div>
 
@@ -241,11 +237,13 @@ const Contact = () => {
                 </label>
                 <input
                   type="tel"
+                  name="phone"
                   required
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors"
                   placeholder="+91 98765 43210"
+                  disabled={loading}
                 />
               </div>
 
@@ -254,9 +252,11 @@ const Contact = () => {
                   Service Interest
                 </label>
                 <select
+                  name="service"
                   value={formData.service}
-                  onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors"
+                  disabled={loading}
                 >
                   <option value="">Select a service</option>
                   <option value="website">AI Website Development</option>
@@ -273,12 +273,14 @@ const Contact = () => {
                   Message *
                 </label>
                 <textarea
+                  name="message"
                   required
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={handleChange}
                   rows={5}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors resize-none"
                   placeholder="Tell us about your project..."
+                  disabled={loading}
                 />
               </div>
 

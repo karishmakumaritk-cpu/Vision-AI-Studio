@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  Bot, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Bot,
+  BarChart3,
+  Settings,
   CreditCard,
   LogOut,
   Menu,
   X,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 
 const DashboardLayout = ({ children, activeTab = 'overview' }) => {
@@ -27,7 +27,6 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
       <motion.aside
         initial={{ x: -300 }}
         animate={{ x: 0 }}
@@ -38,10 +37,9 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
         `}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="p-6 border-b border-gray-200">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               {isSidebarOpen && (
@@ -53,20 +51,19 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
             </Link>
           </div>
 
-          {/* Menu Items */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
-              
+
               return (
                 <Link
                   key={item.id}
                   to={item.path}
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-                    ${isActive 
-                      ? 'bg-purple-50 text-purple-600 font-semibold' 
+                    ${isActive
+                      ? 'bg-primary-50 text-primary-600 font-semibold'
                       : 'text-gray-700 hover:bg-gray-50'
                     }
                   `}
@@ -78,7 +75,6 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
             })}
           </nav>
 
-          {/* Logout */}
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={() => navigate('/')}
@@ -91,9 +87,7 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
         </div>
       </motion.aside>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="px-6 py-4 flex items-center justify-between">
             <button
@@ -104,13 +98,12 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
             </button>
 
             <div className="flex items-center gap-4 ml-auto">
-              {/* User Info */}
               <div className="flex items-center gap-3">
                 <div className="text-right hidden md:block">
                   <div className="text-sm font-semibold text-gray-900">Demo User</div>
                   <div className="text-xs text-gray-500">demo@herbalanceai.com</div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold">
                   D
                 </div>
               </div>
@@ -118,10 +111,7 @@ const DashboardLayout = ({ children, activeTab = 'overview' }) => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6">
-          {children}
-        </main>
+        <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
   );

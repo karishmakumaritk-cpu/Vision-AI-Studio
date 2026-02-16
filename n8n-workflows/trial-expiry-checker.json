@@ -1,0 +1,103 @@
+{
+  "name": "Trial Expiry Checker (Daily Cron)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Daily Midnight",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM users WHERE plan = 'free_trial' AND trial_end < NOW() AND status = 'active'"
+      },
+      "name": "Find Expired Trials",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "users",
+        "updateKey": "id",
+        "columns": {
+          "mappings": [
+            {
+              "column": "status",
+              "value": "trial_expired"
+            }
+          ]
+        }
+      },
+      "name": "Update User Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "automations",
+        "updateKey": "user_id",
+        "columns": {
+          "mappings": [
+            {
+              "column": "status",
+              "value": "paused"
+            }
+          ]
+        },
+        "where": {
+          "conditions": [
+            {
+              "column": "user_id",
+              "value": "={{$json[\"id\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "Pause Automations",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@herbalanceai.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Your HerBalance AI Trial Has Ended",
+        "text": "Hi {{$json[\"name\"]}},\n\nYour 7-day trial has ended.\n\nSpecial Offer: Upgrade now and get 20% off.\n\nUpgrade: https://herbalanceai.com/pricing\n\nTeam HerBalance AI"
+      },
+      "name": "Send Expiry Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Schedule - Daily Midnight": {
+      "main": [[{"node": "Find Expired Trials", "type": "main", "index": 0}]]
+    },
+    "Find Expired Trials": {
+      "main": [[{"node": "Update User Status", "type": "main", "index": 0}]]
+    },
+    "Update User Status": {
+      "main": [[{"node": "Pause Automations", "type": "main", "index": 0}]]
+    },
+    "Pause Automations": {
+      "main": [[{"node": "Send Expiry Email", "type": "main", "index": 0}]]
+    }
+  }
+}

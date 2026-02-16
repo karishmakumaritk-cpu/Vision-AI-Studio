@@ -1,0 +1,140 @@
+{
+  "name": "Lead Capture & Trial Activation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Lead Capture",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "lead_id",
+              "value": "={{$json[\"lead_id\"]}}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{$json[\"user_id\"]}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$json[\"email\"]}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$json[\"name\"]}}"
+            },
+            {
+              "name": "service_interest",
+              "value": "={{$json[\"service_interest\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "Extract Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "automation_logs",
+        "columns": {
+          "mappings": [
+            {
+              "column": "user_id",
+              "value": "={{$json[\"user_id\"]}}"
+            },
+            {
+              "column": "action_type",
+              "value": "lead_captured"
+            },
+            {
+              "column": "details",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        }
+      },
+      "name": "Log to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@herbalanceai.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Welcome to HerBalance AI - Your Trial Starts Now!",
+        "text": "Hi {{$json[\"name\"]}},\n\nWelcome to HerBalance AI! Your 7-day free trial is now active.\n\nWhat's next:\n- Access your dashboard\n- Explore demo automations\n- Test AI features\n\nLogin: {{$json[\"email\"]}}\nTrial Ends: {{new Date(Date.now() + 7*24*60*60*1000).toDateString()}}\n\nLet's automate your success!\n\nTeam HerBalance AI"
+      },
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "demo_data",
+        "columns": {
+          "mappings": [
+            {
+              "column": "user_id",
+              "value": "={{$json[\"user_id\"]}}"
+            },
+            {
+              "column": "data_type",
+              "value": "={{$json[\"service_interest\"]}}"
+            },
+            {
+              "column": "data",
+              "value": "={{JSON.stringify({demo_mode: true, service: $json['service_interest']})}}"
+            }
+          ]
+        }
+      },
+      "name": "Create Demo Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({success: true, message: 'Lead captured and trial activated'})}}"
+      },
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Lead Capture": {
+      "main": [[{"node": "Extract Data", "type": "main", "index": 0}]]
+    },
+    "Extract Data": {
+      "main": [[{"node": "Log to Database", "type": "main", "index": 0}]]
+    },
+    "Log to Database": {
+      "main": [[
+        {"node": "Send Welcome Email", "type": "main", "index": 0},
+        {"node": "Create Demo Data", "type": "main", "index": 0}
+      ]]
+    },
+    "Create Demo Data": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    }
+  }
+}
