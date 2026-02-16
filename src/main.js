@@ -3,6 +3,8 @@ const AUTOMATIONS = [
     id: 'instagram_growth',
     title: 'Instagram Growth',
     description: 'Generate reel ideas, captions, hashtags, and engagement actions.',
+    image:
+      'https://images.pexels.com/photos/5053837/pexels-photo-5053837.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'handle', label: 'Instagram handle', placeholder: 'yourbrand' },
       {
@@ -28,6 +30,8 @@ const AUTOMATIONS = [
     id: 'whatsapp_bot',
     title: 'WhatsApp Auto-Reply',
     description: 'Handle common questions, order updates, and appointment requests.',
+    image:
+      'https://images.pexels.com/photos/4393665/pexels-photo-4393665.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'phone', label: 'Business WhatsApp number', placeholder: '+91...' },
       {
@@ -52,6 +56,8 @@ const AUTOMATIONS = [
     id: 'voice_assistant',
     title: 'AI Voice Assistant',
     description: 'Capture calls, answer FAQs, and qualify leads automatically.',
+    image:
+      'https://images.pexels.com/photos/7709085/pexels-photo-7709085.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'lineName', label: 'Phone line name', placeholder: 'Main Sales Line' },
       {
@@ -77,6 +83,8 @@ const AUTOMATIONS = [
     id: 'email_automation',
     title: 'Email Automation',
     description: 'Classify inbox items, generate replies, and send follow-ups.',
+    image:
+      'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'inbox', label: 'Primary inbox', placeholder: 'support@yourdomain.com' },
       {
@@ -102,6 +110,8 @@ const AUTOMATIONS = [
     id: 'ecommerce_orders',
     title: 'E-commerce Orders',
     description: 'Track orders, send updates, and recover abandoned carts.',
+    image:
+      'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'store', label: 'Store platform', type: 'select', options: ['Shopify', 'WooCommerce', 'Custom'] },
       { key: 'dailyOrders', label: 'Average daily orders', placeholder: '50' },
@@ -122,6 +132,8 @@ const AUTOMATIONS = [
     id: 'customer_support',
     title: 'Customer Support',
     description: 'Resolve repetitive queries with AI-assisted response flows.',
+    image:
+      'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1200',
     questions: [
       { key: 'channels', label: 'Support channels', placeholder: 'Email, chat, WhatsApp' },
       {
@@ -159,16 +171,28 @@ app.innerHTML = `
   </header>
 
   <section class="hero">
-    <p class="eyebrow">Select. Click. Automate. Done in 60 seconds.</p>
-    <h1>Stop doing repetitive tasks. Let AI handle them.</h1>
-    <p class="hero-copy">
-      Build and launch business automation flows in a guided setup. No technical configuration required.
-      Choose a use-case, answer three questions, preview output, and activate your trial.
-    </p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" id="hero-start-btn">What do you want to automate today?</button>
-      <button class="btn btn-ghost" id="hero-custom-btn">Describe a custom automation</button>
+    <div>
+      <p class="eyebrow">Select. Click. Automate. Done in 60 seconds.</p>
+      <h1>Stop doing repetitive tasks. Let AI handle them.</h1>
+      <p class="hero-copy">
+        Build and launch business automation flows in a guided setup. No technical configuration required.
+        Choose a use-case, answer three questions, preview output, and activate your trial.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="hero-start-btn">What do you want to automate today?</button>
+        <button class="btn btn-ghost" id="hero-custom-btn">Describe a custom automation</button>
+      </div>
     </div>
+    <div class="hero-visual">
+      <img
+        src="https://images.pexels.com/photos/6476589/pexels-photo-6476589.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        alt="Automation dashboard preview"
+      />
+    </div>
+  </section>
+
+  <section class="logo-strip">
+    <p>Designed for growing brands, agencies, and online businesses.</p>
   </section>
 
   <section id="catalog" class="catalog-section">
@@ -226,9 +250,12 @@ function renderCards() {
   cardsContainer.innerHTML = AUTOMATIONS.map(
     (item) => `
       <button class="card" data-id="${item.id}">
-        <h3>${item.title}</h3>
-        <p>${item.description}</p>
-        <span>Set up in 60 seconds</span>
+        <img src="${item.image}" alt="${item.title}" loading="lazy" />
+        <div class="card-body">
+          <h3>${item.title}</h3>
+          <p>${item.description}</p>
+          <span>Set up in 60 seconds</span>
+        </div>
       </button>
     `
   ).join('');

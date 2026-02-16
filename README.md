@@ -47,3 +47,8 @@ npm run build
 3. Read generated previews from backend response instead of static sample arrays
 4. Connect billing action to Razorpay checkout endpoint
 5. Add authentication and dashboard routes
+
+## UI assets
+
+- Hero and automation card visuals use free stock images from Pexels over public CDN URLs.
+- If you want to host images locally later, place them under `public/images` and update `src/main.js`.
