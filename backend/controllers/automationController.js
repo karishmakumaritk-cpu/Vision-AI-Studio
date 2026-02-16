@@ -1,16 +1,17 @@
-const { randomUUID } = require('crypto');
-const store = require('../storage/inMemoryStore');
-
-const { automations, demoData, automationLogs } = store;
+const supabase = require('../config/db');
 
 // Get user automations
 exports.getUserAutomations = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const data = automations
-      .filter((automation) => automation.user_id === userId)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const { data, error } = await supabase
+      .from('automations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -30,14 +31,13 @@ exports.getAutomationById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const data = automations.find((automation) => automation.id === id);
+    const { data, error } = await supabase
+      .from('automations')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        error: 'Automation not found'
-      });
-    }
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -65,17 +65,14 @@ exports.updateAutomationStatus = async (req, res) => {
       });
     }
 
-    const data = automations.find((automation) => automation.id === id);
+    const { data, error } = await supabase
+      .from('automations')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        error: 'Automation not found'
-      });
-    }
-
-    data.status = status;
-    data.updated_at = new Date().toISOString();
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -96,14 +93,14 @@ exports.getAutomationLogs = async (req, res) => {
     const { automationId } = req.params;
     const { limit = 50, offset = 0 } = req.query;
 
-    const allLogs = automationLogs
-      .filter((log) => log.automation_id === automationId)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const { data, error, count } = await supabase
+      .from('automation_logs')
+      .select('*', { count: 'exact' })
+      .eq('automation_id', automationId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
-    const start = Number(offset);
-    const end = start + Number(limit);
-    const data = allLogs.slice(start, end);
-    const count = allLogs.length;
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -124,9 +121,13 @@ exports.getDemoData = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const data = demoData
-      .filter((entry) => entry.user_id === userId)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const { data, error } = await supabase
+      .from('demo_data')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -147,23 +148,36 @@ exports.logAutomationAction = async (req, res) => {
     const { automationId } = req.params;
     const { userId, actionType, details } = req.body;
 
-    const data = {
-      id: randomUUID(),
-      user_id: userId,
-      automation_id: automationId,
-      action_type: actionType,
-      details: details || {},
-      created_at: new Date().toISOString(),
-    };
+    const { data, error } = await supabase
+      .from('automation_logs')
+      .insert([{
+        user_id: userId,
+        automation_id: automationId,
+        action_type: actionType,
+        details: details || {}
+      }])
+      .select()
+      .single();
 
-    automationLogs.push(data);
+    if (error) throw error;
 
     // Update automation usage count
-    const automation = automations.find((entry) => entry.id === automationId);
-    if (automation) {
-      automation.usage_count = (automation.usage_count || 0) + 1;
-      automation.updated_at = new Date().toISOString();
-    }
+    await supabase.rpc('increment_automation_usage', {
+      automation_id: automationId
+    }).catch(() => {
+      // Fallback if RPC function doesn't exist
+      supabase
+        .from('automations')
+        .select('usage_count')
+        .eq('id', automationId)
+        .single()
+        .then(({ data: auto }) => {
+          supabase
+            .from('automations')
+            .update({ usage_count: (auto.usage_count || 0) + 1 })
+            .eq('id', automationId);
+        });
+    });
 
     res.status(201).json({
       success: true,

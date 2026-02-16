@@ -48,7 +48,7 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     message: 'HerBalance AI Backend is running',
     timestamp: new Date().toISOString(),
-    storage: 'in-memory'
+    storage: 'supabase'
   });
 });
 

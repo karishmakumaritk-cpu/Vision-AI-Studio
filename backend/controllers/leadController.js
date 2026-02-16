@@ -1,9 +1,6 @@
-const { randomUUID } = require('crypto');
+const supabase = require('../config/db');
 const { sendWelcomeEmail } = require('../utils/email');
 const { triggerN8nWorkflow } = require('../utils/n8n');
-const store = require('../storage/inMemoryStore');
-
-const { users, leads, automations, demoData } = store;
 
 // Create New Lead
 exports.createLead = async (req, res) => {
@@ -11,7 +8,11 @@ exports.createLead = async (req, res) => {
     const { name, email, phone, business_type, service_interest, message } = req.body;
 
     // Check if user already exists
-    const existingUser = users.find((user) => user.email === email);
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
     let userId;
     let isNewUser = false;
@@ -22,55 +23,65 @@ exports.createLead = async (req, res) => {
       const trialEnd = new Date();
       trialEnd.setDate(trialEnd.getDate() + 7);
 
-      const newUser = {
-        id: randomUUID(),
-        name,
-        email,
-        phone: phone || null,
-        business_type: business_type || null,
-        plan: 'free_trial',
-        trial_start: trialStart.toISOString(),
-        trial_end: trialEnd.toISOString(),
-        status: 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      const { data: newUser, error: userError } = await supabase
+        .from('users')
+        .insert([{
+          name,
+          email,
+          phone: phone || null,
+          business_type: business_type || null,
+          plan: 'free_trial',
+          trial_start: trialStart.toISOString(),
+          trial_end: trialEnd.toISOString(),
+          status: 'active'
+        }])
+        .select()
+        .single();
 
-      users.push(newUser);
+      if (userError) {
+        console.error('User creation error:', userError);
+        throw userError;
+      }
 
       userId = newUser.id;
       isNewUser = true;
 
-      // Non-blocking side effects for demo environment
-      sendWelcomeEmail(email, name, trialEnd).catch(() => {});
-      triggerN8nWorkflow('trial-activation', {
+      // Send welcome email
+      await sendWelcomeEmail(email, name, trialEnd);
+
+      // Trigger trial activation workflow
+      await triggerN8nWorkflow('trial-activation', {
         user_id: userId,
         email,
         name,
-        trial_end: trialEnd.toISOString(),
-      }).catch(() => {});
+        trial_end: trialEnd.toISOString()
+      });
 
     } else {
       userId = existingUser.id;
     }
 
     // Create lead entry
-    const lead = {
-      id: randomUUID(),
-      user_id: userId,
-      name,
-      email,
-      phone: phone || null,
-      business_type: business_type || null,
-      service_interest: service_interest || null,
-      message,
-      source: 'website',
-      status: 'new',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const { data: lead, error: leadError } = await supabase
+      .from('leads')
+      .insert([{
+        user_id: userId,
+        name,
+        email,
+        phone: phone || null,
+        business_type: business_type || null,
+        service_interest: service_interest || null,
+        message,
+        source: 'website',
+        status: 'new'
+      }])
+      .select()
+      .single();
 
-    leads.push(lead);
+    if (leadError) {
+      console.error('Lead creation error:', leadError);
+      throw leadError;
+    }
 
     // Auto-assign automation based on service interest
     if (service_interest) {
@@ -78,13 +89,13 @@ exports.createLead = async (req, res) => {
     }
 
     // Trigger lead capture workflow in n8n
-    triggerN8nWorkflow('lead-capture', {
+    await triggerN8nWorkflow('lead-capture', {
       lead_id: lead.id,
       user_id: userId,
       service_interest: service_interest || 'general',
       email,
-      name,
-    }).catch(() => {});
+      name
+    });
 
     res.status(201).json({
       success: true,
@@ -126,22 +137,23 @@ async function autoAssignAutomation(userId, serviceInterest) {
     const automationType = automationMap[serviceInterest] || 'basic_automation';
 
     // Create automation entry
-    const data = {
-      id: randomUUID(),
-      user_id: userId,
-      automation_type: automationType,
-      status: 'active',
-      usage_count: 0,
-      usage_limit: 50,
-      config: {
-        demo_mode: true,
-        service: serviceInterest,
-      },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const { data, error } = await supabase
+      .from('automations')
+      .insert([{
+        user_id: userId,
+        automation_type: automationType,
+        status: 'active',
+        usage_count: 0,
+        usage_limit: 50, // Trial limit
+        config: {
+          demo_mode: true,
+          service: serviceInterest
+        }
+      }])
+      .select()
+      .single();
 
-    automations.push(data);
+    if (error) throw error;
 
     // Generate demo data for this automation
     await generateDemoData(userId, automationType);
@@ -204,15 +216,16 @@ async function generateDemoData(userId, automationType) {
       }
     };
 
-    const data = demoDataMap[automationType] || { message: 'Demo data generated' };
+    const demoData = demoDataMap[automationType] || { message: 'Demo data generated' };
 
-    demoData.push({
-      id: randomUUID(),
-      user_id: userId,
-      data_type: automationType,
-      data,
-      created_at: new Date().toISOString(),
-    });
+    // Store in database
+    await supabase
+      .from('demo_data')
+      .insert([{
+        user_id: userId,
+        data_type: automationType,
+        data: demoData
+      }]);
 
     console.log(`✅ Demo data generated for: ${automationType}`);
 
@@ -224,9 +237,12 @@ async function generateDemoData(userId, automationType) {
 // Get all leads (admin)
 exports.getAllLeads = async (req, res) => {
   try {
-    const data = [...leads].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -246,14 +262,13 @@ exports.getLeadById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const data = leads.find((lead) => lead.id === id);
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        error: 'Lead not found',
-      });
-    }
+    if (error) throw error;
 
     res.json({
       success: true,
@@ -281,17 +296,14 @@ exports.updateLeadStatus = async (req, res) => {
       });
     }
 
-    const data = leads.find((lead) => lead.id === id);
+    const { data, error } = await supabase
+      .from('leads')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        error: 'Lead not found',
-      });
-    }
-
-    data.status = status;
-    data.updated_at = new Date().toISOString();
+    if (error) throw error;
 
     res.json({
       success: true,
