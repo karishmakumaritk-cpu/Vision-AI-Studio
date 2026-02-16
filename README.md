@@ -1,6 +1,6 @@
-# HerBalance AI Studio
+# Vision AI Studio
 
-This repository implements an MVP frontend for the HerBalance AI product vision.
+This repository implements an MVP frontend for the Vision AI product vision.
 
 ## Implemented user flow
 

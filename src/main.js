@@ -206,7 +206,7 @@ const app = document.querySelector('#app');
 
 app.innerHTML = `
   <header class="topbar">
-    <div class="brand">HerBalance AI</div>
+    <div class="brand">Vision AI</div>
     <nav>
       <a href="#catalog">Automations</a>
       <a href="#methods">Methods</a>
