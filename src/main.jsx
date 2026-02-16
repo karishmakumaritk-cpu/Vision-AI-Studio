@@ -6,12 +6,13 @@ import Home from './pages/Home';
 import Services from './pages/Services';
 import Products from './pages/Products';
 import Contact from './pages/Contact';
+import Dashboard from './pages/Dashboard';
 import './styles/index.css';
 
 const router = createBrowserRouter(
   [
     {
-      path: '*',
+      path: '/',
       element: <App />,
       children: [
         { index: true, element: <Home /> },
@@ -19,6 +20,10 @@ const router = createBrowserRouter(
         { path: 'products', element: <Products /> },
         { path: 'contact', element: <Contact /> }
       ]
+    },
+    {
+      path: 'dashboard',
+      element: <Dashboard />
     }
   ],
   {
