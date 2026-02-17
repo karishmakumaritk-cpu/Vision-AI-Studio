@@ -29,8 +29,6 @@ nav {
 }
 .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.08rem; }
 
-.brand-wrap { display: flex; flex-direction: column; gap: 0.2rem; }
-.build-chip { font-size: 0.68rem; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0.1rem 0.45rem; width: fit-content; }
 .nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
 .nav-links a { color: var(--muted); font-size: 0.95rem; }
 .nav-links a:hover { color: var(--text); }

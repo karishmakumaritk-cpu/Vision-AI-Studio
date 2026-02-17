@@ -2,8 +2,6 @@ import './styles.css';
 
 const app = document.querySelector('#app');
 
-const BUILD_VERSION = '2026.02.17.1';
-
 const PLANS = {
   starter: { name: 'Starter Automation Plan', price: '₹1499/month', workflows: 1, leads: 100 },
   growth: { name: 'Growth Automation Plan', price: '₹3999/month', workflows: 5, leads: 500 },
@@ -14,42 +12,42 @@ const WORKFLOWS = [
   {
     key: 'lead-capture',
     name: 'Lead Capture Automation',
-    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'Lead Capture → Auto Reply → Follow-up → CRM Save',
     fields: ['Business Name', 'Lead Source', 'Follow-up Delay', 'Support Email', 'WhatsApp Number']
   },
   {
     key: 'abandoned-cart',
     name: 'Abandoned Cart Recovery',
-    image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/5632398/pexels-photo-5632398.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'Cart Add → Checkout Drop → Reminder + Offer',
     fields: ['Store URL', 'Cart Timeout (minutes)', 'Discount Code', 'Reminder Channel', 'Payment URL']
   },
   {
     key: 'complaint-automation',
     name: 'Complaint Automation',
-    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/7709088/pexels-photo-7709088.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'Complaint → Ticket → Escalation → Resolve',
     fields: ['Complaint Categories', 'Support Team Email', 'Escalation Email', 'SLA Hours', 'Refund Rules']
   },
   {
     key: 'whatsapp-order',
     name: 'WhatsApp Order Automation',
-    image: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/843700/pexels-photo-843700.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'Order → Payment Link → Invoice → Confirmation',
     fields: ['WhatsApp Number', 'Product Catalog URL', 'Payment Gateway', 'Invoice Email', 'Delivery Timeline']
   },
   {
     key: 'ai-voice-agent',
     name: 'AI Voice Agent',
-    image: 'https://images.unsplash.com/photo-1590650153855-d9e808231d41?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/8867434/pexels-photo-8867434.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'Call → Conversation → Booking → Calendar Update',
     fields: ['Business Hours', 'Call Script', 'Escalation Number', 'Calendar Link', 'Language']
   },
   {
     key: 'instagram-dm',
     name: 'Instagram DM Automation',
-    image: 'https://images.unsplash.com/photo-1611262588019-db6cc2032da3?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.pexels.com/photos/50614/pexels-photo-50614.jpeg?auto=compress&cs=tinysrgb&w=1200',
     flow: 'DM → Auto Reply → Lead Save → Follow-up',
     fields: ['Instagram Handle', 'Reply Tone', 'Lead Form Link', 'Follow-up Delay', 'Offer Message']
   }
@@ -93,10 +91,7 @@ function trialInfo(auth) {
 
 function header() {
   return `<nav>
-    <div class="brand-wrap">
-      <a class="logo" href="#/">Vision-AI-Studio</a>
-      <span class="build-chip">Build ${BUILD_VERSION}</span>
-    </div>
+    <a class="logo" href="#/">Vision-AI-Studio</a>
     <div class="nav-links">
       <a href="#/">Home</a>
       <a href="#/pricing">Pricing</a>
