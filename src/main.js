@@ -2,250 +2,282 @@ import './styles.css';
 
 const app = document.querySelector('#app');
 
-const PLAN_LIMITS = {
-  starter: { workflows: 1, leads: 100, calls: 0, price: '₹1499/month' },
-  growth: { workflows: 5, leads: 500, calls: 50, price: '₹3999/month' },
-  pro: { workflows: 'Unlimited', leads: 'Unlimited', calls: 'Unlimited', price: '₹7999/month' }
+const PLANS = {
+  starter: { name: 'Starter Automation Plan', price: '₹1499/month', workflows: 1, leads: 100 },
+  growth: { name: 'Growth Automation Plan', price: '₹3999/month', workflows: 5, leads: 500 },
+  pro: { name: 'Pro AI Business Plan', price: '₹7999/month', workflows: 999, leads: 9999 }
 };
 
-const WORKFLOW_CATALOG = [
-  { key: 'lead_capture', emoji: '🤖', name: 'Lead Capture Automation', desc: 'Lead Capture → Auto Reply → Follow-up → CRM Save' },
-  { key: 'abandoned_cart', emoji: '🛒', name: 'Abandoned Cart Recovery', desc: 'Recover missed checkouts with reminders + offers' },
-  { key: 'complaint_automation', emoji: '🎧', name: 'Complaint Automation', desc: 'Complaint Handling → Ticket + escalation workflow' },
-  { key: 'whatsapp_order', emoji: '💬', name: 'WhatsApp Order Automation', desc: 'Order taking → Payment link → Invoice on WhatsApp' },
-  { key: 'ai_voice', emoji: '📞', name: 'AI Voice Agent', desc: 'AI voice calls → Booking → Calendar update' },
-  { key: 'instagram_dm', emoji: '📸', name: 'Instagram DM Automation', desc: 'DM auto-response → Lead save → Follow-up' }
+const WORKFLOWS = [
+  {
+    key: 'lead-capture',
+    name: 'Lead Capture Automation',
+    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=1200&q=80&auto=format&fit=crop',
+    flow: 'Lead Capture → Auto Reply → Follow-up → CRM Save',
+    fields: ['Business Name', 'Lead Source', 'Follow-up Delay', 'Support Email', 'WhatsApp Number']
+  },
+  {
+    key: 'abandoned-cart',
+    name: 'Abandoned Cart Recovery',
+    image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1200&q=80&auto=format&fit=crop',
+    flow: 'Cart Add → Checkout Drop → Reminder + Offer',
+    fields: ['Store URL', 'Cart Timeout (minutes)', 'Discount Code', 'Reminder Channel', 'Payment URL']
+  },
+  {
+    key: 'complaint-automation',
+    name: 'Complaint Automation',
+    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&auto=format&fit=crop',
+    flow: 'Complaint → Ticket → Escalation → Resolve',
+    fields: ['Complaint Categories', 'Support Team Email', 'Escalation Email', 'SLA Hours', 'Refund Rules']
+  },
+  {
+    key: 'whatsapp-order',
+    name: 'WhatsApp Order Automation',
+    image: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=1200&q=80&auto=format&fit=crop',
+    flow: 'Order → Payment Link → Invoice → Confirmation',
+    fields: ['WhatsApp Number', 'Product Catalog URL', 'Payment Gateway', 'Invoice Email', 'Delivery Timeline']
+  },
+  {
+    key: 'ai-voice-agent',
+    name: 'AI Voice Agent',
+    image: 'https://images.unsplash.com/photo-1590650153855-d9e808231d41?w=1200&q=80&auto=format&fit=crop',
+    flow: 'Call → Conversation → Booking → Calendar Update',
+    fields: ['Business Hours', 'Call Script', 'Escalation Number', 'Calendar Link', 'Language']
+  },
+  {
+    key: 'instagram-dm',
+    name: 'Instagram DM Automation',
+    image: 'https://images.unsplash.com/photo-1611262588019-db6cc2032da3?w=1200&q=80&auto=format&fit=crop',
+    flow: 'DM → Auto Reply → Lead Save → Follow-up',
+    fields: ['Instagram Handle', 'Reply Tone', 'Lead Form Link', 'Follow-up Delay', 'Offer Message']
+  }
 ];
 
-function defaultState() {
+const ACTION_MAP = {
+  'lead-capture': ['Form submitted', 'Auto email sent', 'WhatsApp confirmation sent', 'Lead saved to CRM', 'Follow-up reminder scheduled'],
+  'abandoned-cart': ['Cart session tracked', 'Email reminder sent', 'WhatsApp reminder sent', 'Discount shared', 'Recovery status updated'],
+  'complaint-automation': ['Complaint received', 'Ticket created', 'Support notified', 'Escalation timer started', 'Resolution workflow triggered'],
+  'whatsapp-order': ['Order intent captured', 'Product menu shared', 'Payment link generated', 'Invoice generated', 'Order confirmation sent'],
+  'ai-voice-agent': ['Incoming call accepted', 'Intent recognized', 'Booking slot selected', 'Calendar updated', 'Confirmation message sent'],
+  'instagram-dm': ['DM intent detected', 'Auto reply sent', 'Lead details requested', 'Lead saved', 'Follow-up queued']
+};
+
+function seed() {
   return {
     auth: null,
     selectedWorkflow: null,
     activeWorkflows: [],
-    usage: { leads: 0, calls: 0, revenue: 0 },
-    onboarding: null
+    logs: [],
+    usage: { leads: 0, calls: 0, automations: 0 }
   };
 }
 
-function getState() {
-  return JSON.parse(localStorage.getItem('vision_saas_state') || JSON.stringify(defaultState()));
+function state() {
+  return JSON.parse(localStorage.getItem('vision_saas_state') || JSON.stringify(seed()));
 }
 
-function setState(next) {
+function save(next) {
   localStorage.setItem('vision_saas_state', JSON.stringify(next));
 }
 
-function createTrial(email, fullName, plan = 'starter') {
-  const now = Date.now();
-  return {
-    userId: `usr_${Math.random().toString(36).slice(2, 10)}`,
-    email,
-    fullName,
-    plan,
-    subscriptionStatus: 'trial_active',
-    trialStartDate: now,
-    trialEndDate: now + 24 * 60 * 60 * 1000,
-    isTrialActive: true
-  };
+function trialInfo(auth) {
+  if (!auth) return { active: false, label: 'Not Started' };
+  const remaining = auth.trialEnd - Date.now();
+  if (remaining <= 0) return { active: false, label: 'Expired' };
+  const h = Math.floor(remaining / (1000 * 60 * 60));
+  const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+  return { active: true, label: `${h}h ${m}m` };
 }
 
-function trialMeta(auth) {
-  if (!auth) return { isActive: false, remainingLabel: '0h 0m' };
-  const diff = auth.trialEndDate - Date.now();
-  if (diff <= 0) return { isActive: false, remainingLabel: 'Expired' };
-  const h = Math.floor(diff / (1000 * 60 * 60));
-  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  return { isActive: true, remainingLabel: `${h}h ${m}m` };
-}
-
-function nav() {
+function header() {
   return `<nav>
-    <a class="logo" href="#/">
-      <div class="logo-icon">⚡</div>
-      <div><div class="logo-text">HerBalance AI</div><span class="logo-sub">Automation Studio</span></div>
-    </a>
+    <a class="logo" href="#/">HerBalance AI</a>
     <div class="nav-links">
       <a href="#/">Home</a>
       <a href="#/pricing">Pricing</a>
       <a href="#/workflows">Workflows</a>
       <a href="#/signup">Signup</a>
       <a href="#/login">Login</a>
+      <a href="#/dashboard">Dashboard</a>
     </div>
-    <a class="nav-cta" href="#/signup">Start 1-Day Trial →</a>
   </nav>`;
 }
 
-function homePage() {
-  return `${nav()}
-  <div class="progress-bar" id="progressBar"></div>
-  <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
-  <div class="grid-bg"></div>
+function home() {
+  return `${header()}
   <section class="hero">
-    <div class="hero-inner">
-      <div>
-        <div class="hero-badge"><div class="badge-dot"></div> Workflow-based SaaS Automation</div>
-        <h1 class="hero-title"><span class="line1">Stop manual ops.</span><br><span class="line2">Automate by workflow.</span><br><span class="line3">Scale with AI.</span></h1>
-        <p class="hero-desc">User signup → 1-day trial active → workflow setup → dashboard tracking → upgrade on expiry.</p>
-        <div class="hero-btns">
-          <a class="btn-primary" href="#catalog">Choose Workflow ↓</a>
-          <a class="btn-secondary" href="#/pricing">See Pricing</a>
-        </div>
-      </div>
-      <div class="hero-card-wrap">
-        <div class="hero-card">
-          <div class="hero-card-header"><div class="card-title">Live Automation Stats</div></div>
-          <div class="hero-stats-grid">
-            <div class="hero-stat"><div class="stat-label">Leads Processed</div><div class="stat-value stat-v1">12,480</div></div>
-            <div class="hero-stat"><div class="stat-label">Calls Handled</div><div class="stat-value stat-v2">3,240</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1>Automation SaaS Platform</h1>
+    <p>Workflow-based pricing, 1-day trial, signup/login, activation and dashboard control.</p>
+    <div class="actions"><a class="btn" href="#/workflows">Choose Workflow</a><a class="btn ghost" href="#/pricing">View Pricing</a></div>
   </section>
-
-  <section class="section" id="catalog">
-    <div class="catalog-header">
-      <div class="section-label">Automation Catalog</div>
-      <h2 class="section-title">Choose your workflow</h2>
-    </div>
-    <div class="catalog-grid">
-      ${WORKFLOW_CATALOG.map((w) => `
-      <article class="auto-card" data-workflow="${w.key}">
-        <div class="card-body">
-          <div class="card-sub">${w.emoji} ${w.name}</div>
-          <div class="card-desc">${w.desc}</div>
-          <button class="card-btn workflow-btn" data-workflow="${w.key}">Setup in Trial →</button>
-        </div>
-      </article>`).join('')}
-    </div>
-  </section>
-
-  <section class="section" id="pricing">
-    <div class="catalog-header"><h2 class="section-title">Workflow-based pricing</h2></div>
-    <div class="pricing-grid">
-      <article class="price-card">
-        <div class="price-name">Starter Automation Plan</div>
-        <div class="price-amount">₹1499<span>/month</span></div>
-        <ul class="price-features">
-          <li class="price-feat">✔ 1 workflow</li><li class="price-feat">✔ 100 leads/month</li><li class="price-feat">✔ Email automation</li><li class="price-feat">✔ Basic chatbot</li><li class="price-feat">✔ 1-day free trial</li>
-        </ul>
-      </article>
-      <article class="price-card popular">
-        <div class="price-badge">Popular</div>
-        <div class="price-name">Growth Automation Plan</div>
-        <div class="price-amount">₹3999<span>/month</span></div>
-        <ul class="price-features">
-          <li class="price-feat">✔ Up to 5 workflows</li><li class="price-feat">✔ 500 leads/month</li><li class="price-feat">✔ WhatsApp automation</li><li class="price-feat">✔ AI chatbot + CRM</li><li class="price-feat">✔ Voice integration (limited)</li>
-        </ul>
-      </article>
-      <article class="price-card">
-        <div class="price-name">Pro AI Business Plan</div>
-        <div class="price-amount">₹7999<span>/month</span></div>
-        <ul class="price-features">
-          <li class="price-feat">✔ Unlimited workflows</li><li class="price-feat">✔ Full AI voice agent</li><li class="price-feat">✔ Advanced CRM</li><li class="price-feat">✔ Complaint automation</li><li class="price-feat">✔ 24/7 AI support</li>
-        </ul>
-      </article>
-    </div>
-  </section>`;
+  ${workflowCatalog()}`;
 }
 
-function authPage(type) {
-  const isSignup = type === 'signup';
-  return `${nav()}<section class="auth-shell"><div class="auth-card">
-  <h2>${isSignup ? 'Create account' : 'Login'}</h2>
-  <p>${isSignup ? 'Start your 1-day SaaS trial' : 'Access your dashboard and workflows'}</p>
-  <form id="auth-form">
-    ${isSignup ? '<input name="fullName" placeholder="Full name" required />' : ''}
-    <input name="email" type="email" placeholder="Email" required />
-    ${isSignup ? `<select name="plan"><option value="starter">Starter</option><option value="growth">Growth</option><option value="pro">Pro</option></select>` : ''}
-    <button type="submit">${isSignup ? 'Activate 1-Day Trial' : 'Continue'}</button>
-  </form>
+function workflowCatalog() {
+  return `<section class="section"><h2>Automation Workflows</h2><div class="grid">${WORKFLOWS.map((w) => `
+  <article class="card wf">
+    <img src="${w.image}" alt="${w.name}" loading="lazy" />
+    <h3>${w.name}</h3>
+    <p>${w.flow}</p>
+    <a class="btn" href="#/workflow/${w.key}">Configure Workflow</a>
+  </article>`).join('')}</div></section>`;
+}
+
+function pricing() {
+  return `${header()}<section class="section"><h2>Workflow-based Pricing</h2><div class="grid plans">
+  ${Object.entries(PLANS).map(([key, p]) => `<article class="card"><h3>${p.name}</h3><p class="price">${p.price}</p><ul>
+  <li>${p.workflows === 999 ? 'Unlimited workflows' : `${p.workflows} workflow${p.workflows > 1 ? 's' : ''}`}</li>
+  <li>${p.leads} leads/month</li><li>Feature-tier access</li><li>1-day free trial</li></ul><a class="btn" href="#/signup">Start ${key}</a></article>`).join('')}
   </div></section>`;
 }
 
-function dashboardPage() {
-  const state = getState();
-  const auth = state.auth;
-  const trial = trialMeta(auth);
-  return `${nav()}<section class="section"><h2 class="section-title">Dashboard</h2>
-  <div class="grid cards3">
-    <article class="card"><p>Account</p><h3>${auth?.email || 'Guest'}</h3><small>${auth?.plan || '-'}</small></article>
-    <article class="card"><p>Trial Remaining</p><h3>${trial.remainingLabel}</h3><small>${trial.isActive ? 'Active' : 'Payment Required'}</small></article>
-    <article class="card"><p>Automation Status</p><h3>${trial.isActive ? 'Active' : 'Paused'}</h3><small>${state.activeWorkflows.length} workflows</small></article>
+function authPage(type) {
+  const signup = type === 'signup';
+  return `${header()}<section class="section auth"><div class="card"><h2>${signup ? 'Signup' : 'Login'}</h2>
+  <form id="auth-form" class="form">
+    ${signup ? '<input required name="name" placeholder="Full Name" />' : ''}
+    <input required type="email" name="email" placeholder="Email" />
+    ${signup ? '<select name="plan"><option value="starter">Starter</option><option value="growth">Growth</option><option value="pro">Pro</option></select>' : ''}
+    <button class="btn" type="submit">${signup ? 'Activate 1-Day Trial' : 'Login'}</button>
+  </form></div></section>`;
+}
+
+function workflowSetup(key) {
+  const workflow = WORKFLOWS.find((w) => w.key === key);
+  if (!workflow) return `${header()}<section class="section"><p>Workflow not found.</p></section>`;
+  return `${header()}<section class="section"><div class="card"><h2>${workflow.name}</h2><p>${workflow.flow}</p>
+  <form id="workflow-form" class="form">
+    ${workflow.fields.map((f) => `<input required name="${f}" placeholder="${f}" />`).join('')}
+    <button class="btn" type="submit">Activate Workflow</button>
+  </form></div></section>`;
+}
+
+function dashboard() {
+  const s = state();
+  const t = trialInfo(s.auth);
+  const active = s.activeWorkflows;
+  return `${header()}<section class="section"><h2>Dashboard</h2>
+  <div class="grid stats">
+    <div class="card"><p>Trial</p><h3>${t.label}</h3></div>
+    <div class="card"><p>Active Workflows</p><h3>${active.length}</h3></div>
+    <div class="card"><p>Leads</p><h3>${s.usage.leads}</h3></div>
+    <div class="card"><p>Calls</p><h3>${s.usage.calls}</h3></div>
   </div>
-  <div class="card form-block">
-    <h3>Master Client Data Form</h3>
-    <div class="grid cards2">
-      <div><h4>Basic Business Info</h4><ul><li>Business name</li><li>Industry</li><li>Website URL</li><li>WhatsApp number</li><li>Business email</li><li>Instagram page</li></ul></div>
-      <div><h4>Lead Automation</h4><ul><li>Lead source</li><li>Follow-up delay</li><li>Follow-up tone</li><li>Offer details</li><li>Payment link</li></ul></div>
-      <div><h4>WhatsApp Bot</h4><ul><li>Product list</li><li>Price list</li><li>Delivery time</li><li>FAQ</li><li>Refund policy</li></ul></div>
-      <div><h4>Voice + Complaint</h4><ul><li>Business hours</li><li>Call script</li><li>Escalation number</li><li>Booking link</li><li>Complaint categories</li><li>Refund rules</li></ul></div>
-    </div>
+  <div class="card"><h3>Active Automation Controls</h3>
+  ${active.length ? active.map((key) => {
+    const w = WORKFLOWS.find((x) => x.key === key);
+    return `<div class="row"><div><strong>${w.name}</strong><p>${w.flow}</p></div><button class="btn run-btn" data-key="${key}">Run Test Action</button></div>`;
+  }).join('') : '<p>No active workflows yet. Configure from workflow page.</p>'}
   </div>
+  <div class="card"><h3>Execution Logs</h3><ul>${s.logs.slice(-10).reverse().map((l) => `<li>${l}</li>`).join('') || '<li>No actions yet.</li>'}</ul></div>
+  <div class="card"><h3>Master Client Data Form Requirements</h3><ul>
+    <li>Business info: name, industry, website, WhatsApp, business email, Instagram page</li>
+    <li>Lead workflow: source, follow-up delay, tone, offer details, payment link</li>
+    <li>WhatsApp bot: product list, price list, delivery time, FAQ, refund policy</li>
+    <li>Voice agent: business hours, script, escalation number, calendar link</li>
+    <li>Complaint automation: complaint categories, tracking, refund rules</li>
+  </ul></div>
   </section>`;
 }
 
-function route() {
+function currentRoute() {
   return location.hash.replace('#', '') || '/';
 }
 
-function bindHome() {
-  document.querySelectorAll('.workflow-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const state = getState();
-      state.selectedWorkflow = btn.dataset.workflow;
-      setState(state);
-      location.hash = '#/signup';
-    });
-  });
+function activateWorkflow(workflowKey, payload) {
+  const s = state();
+  const ti = trialInfo(s.auth);
+  if (!ti.active) return { ok: false, msg: 'Trial expired or login required. Please upgrade/login.' };
 
-  window.addEventListener('scroll', () => {
-    const total = document.documentElement.scrollHeight - window.innerHeight;
-    const value = total > 0 ? (window.scrollY / total) * 100 : 0;
-    const bar = document.querySelector('#progressBar');
-    if (bar) bar.style.width = `${value}%`;
-  }, { passive: true });
+  const plan = s.auth.plan || 'starter';
+  const limit = PLANS[plan].workflows;
+  if (!s.activeWorkflows.includes(workflowKey) && s.activeWorkflows.length >= limit) {
+    return { ok: false, msg: `Plan limit reached. ${PLANS[plan].name} allows ${limit} workflows.` };
+  }
+
+  if (!s.activeWorkflows.includes(workflowKey)) s.activeWorkflows.push(workflowKey);
+  s.usage.automations = s.activeWorkflows.length;
+  s.logs.push(`[${new Date().toLocaleString()}] ${workflowKey} configured with ${Object.keys(payload).length} fields`);
+  save(s);
+  return { ok: true };
 }
 
-function bindAuth(type) {
-  const form = document.querySelector('#auth-form');
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = new FormData(form);
-    const state = getState();
+function runWorkflowAction(workflowKey) {
+  const s = state();
+  const steps = ACTION_MAP[workflowKey] || ['Workflow action executed'];
+  const pick = steps[Math.floor(Math.random() * steps.length)];
+  if (workflowKey === 'lead-capture' || workflowKey === 'instagram-dm') s.usage.leads += 1;
+  if (workflowKey === 'ai-voice-agent') s.usage.calls += 1;
+  s.logs.push(`[${new Date().toLocaleString()}] ${pick}`);
+  save(s);
+  render();
+}
 
-    if (type === 'signup') {
-      state.auth = createTrial(data.get('email'), data.get('fullName'), data.get('plan'));
-      if (state.selectedWorkflow && !state.activeWorkflows.includes(state.selectedWorkflow)) {
-        state.activeWorkflows.push(state.selectedWorkflow);
+function bind() {
+  const route = currentRoute();
+
+  const authForm = document.querySelector('#auth-form');
+  if (authForm) {
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(authForm);
+      const s = state();
+      if (route === '/signup') {
+        s.auth = {
+          userId: `usr_${Math.random().toString(36).slice(2, 10)}`,
+          name: d.get('name'),
+          email: d.get('email'),
+          plan: d.get('plan'),
+          trialStart: Date.now(),
+          trialEnd: Date.now() + 24 * 60 * 60 * 1000
+        };
+      } else {
+        if (!s.auth) {
+          s.auth = {
+            userId: `usr_${Math.random().toString(36).slice(2, 10)}`,
+            name: d.get('email').toString().split('@')[0],
+            email: d.get('email'),
+            plan: 'starter',
+            trialStart: Date.now(),
+            trialEnd: Date.now() + 24 * 60 * 60 * 1000
+          };
+        }
       }
-    } else if (state.auth?.email === data.get('email')) {
-      // pass-through
-    } else {
-      state.auth = createTrial(data.get('email'), data.get('email').split('@')[0], 'starter');
-    }
+      save(s);
+      location.hash = '#/dashboard';
+    });
+  }
 
-    setState(state);
-    location.hash = '#/dashboard';
+  const workflowForm = document.querySelector('#workflow-form');
+  if (workflowForm) {
+    workflowForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const key = route.split('/')[2];
+      const payload = Object.fromEntries(new FormData(workflowForm).entries());
+      const result = activateWorkflow(key, payload);
+      if (!result.ok) {
+        alert(result.msg);
+        return;
+      }
+      location.hash = '#/dashboard';
+    });
+  }
+
+  document.querySelectorAll('.run-btn').forEach((btn) => {
+    btn.addEventListener('click', () => runWorkflowAction(btn.dataset.key));
   });
 }
 
 function render() {
-  const r = route();
-  if (r === '/signup') {
-    app.innerHTML = authPage('signup');
-    bindAuth('signup');
-  } else if (r === '/login') {
-    app.innerHTML = authPage('login');
-    bindAuth('login');
-  } else if (r === '/dashboard') {
-    app.innerHTML = dashboardPage();
-  } else {
-    app.innerHTML = homePage();
-    bindHome();
-    if (r === '/pricing') document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' });
-    if (r === '/workflows') document.querySelector('#catalog')?.scrollIntoView({ behavior: 'smooth' });
-  }
+  const route = currentRoute();
+  if (route === '/pricing') app.innerHTML = pricing();
+  else if (route === '/workflows') app.innerHTML = `${header()}${workflowCatalog()}`;
+  else if (route === '/signup') app.innerHTML = authPage('signup');
+  else if (route === '/login') app.innerHTML = authPage('login');
+  else if (route === '/dashboard') app.innerHTML = dashboard();
+  else if (route.startsWith('/workflow/')) app.innerHTML = workflowSetup(route.split('/')[2]);
+  else app.innerHTML = home();
+  bind();
 }
 
 window.addEventListener('hashchange', render);
