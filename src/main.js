@@ -89,6 +89,25 @@ function trialInfo(auth) {
   return { active: true, label: `${h}h ${m}m` };
 }
 
+
+function visualChrome() {
+  return `<div class="progress-bar" id="progressBar"></div>
+  <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+  <div class="grid-bg"></div>`;
+}
+
+function withChrome(content) {
+  return `${visualChrome()}${content}`;
+}
+
+function updateProgressBar() {
+  const el = document.querySelector('#progressBar');
+  if (!el) return;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+  el.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+}
+
 function header() {
   return `<nav>
     <a class="logo" href="#/">Vision-AI-Studio</a>
@@ -104,13 +123,13 @@ function header() {
 }
 
 function home() {
-  return `${header()}
+  return withChrome(`${header()}
   <section class="hero">
     <h1>Automation SaaS Platform</h1>
     <p>Workflow-based pricing, 1-day trial, signup/login, activation and dashboard control.</p>
     <div class="actions"><a class="btn" href="#/workflows">Choose Workflow</a><a class="btn ghost" href="#/pricing">View Pricing</a></div>
   </section>
-  ${workflowCatalog()}`;
+  ${workflowCatalog()}`);
 }
 
 function workflowCatalog() {
@@ -124,39 +143,39 @@ function workflowCatalog() {
 }
 
 function pricing() {
-  return `${header()}<section class="section"><h2>Workflow-based Pricing</h2><div class="grid plans">
+  return withChrome(`${header()}<section class="section"><h2>Workflow-based Pricing</h2><div class="grid plans">
   ${Object.entries(PLANS).map(([key, p]) => `<article class="card"><h3>${p.name}</h3><p class="price">${p.price}</p><ul>
   <li>${p.workflows === 999 ? 'Unlimited workflows' : `${p.workflows} workflow${p.workflows > 1 ? 's' : ''}`}</li>
   <li>${p.leads} leads/month</li><li>Feature-tier access</li><li>1-day free trial</li></ul><a class="btn" href="#/signup">Start ${key}</a></article>`).join('')}
-  </div></section>`;
+  </div></section>`);
 }
 
 function authPage(type) {
   const signup = type === 'signup';
-  return `${header()}<section class="section auth"><div class="card"><h2>${signup ? 'Signup' : 'Login'}</h2>
+  return withChrome(`${header()}<section class="section auth"><div class="card"><h2>${signup ? 'Signup' : 'Login'}</h2>
   <form id="auth-form" class="form">
     ${signup ? '<input required name="name" placeholder="Full Name" />' : ''}
     <input required type="email" name="email" placeholder="Email" />
     ${signup ? '<select name="plan"><option value="starter">Starter</option><option value="growth">Growth</option><option value="pro">Pro</option></select>' : ''}
     <button class="btn" type="submit">${signup ? 'Activate 1-Day Trial' : 'Login'}</button>
-  </form></div></section>`;
+  </form></div></section>`);
 }
 
 function workflowSetup(key) {
   const workflow = WORKFLOWS.find((w) => w.key === key);
-  if (!workflow) return `${header()}<section class="section"><p>Workflow not found.</p></section>`;
-  return `${header()}<section class="section"><div class="card"><h2>${workflow.name}</h2><p>${workflow.flow}</p>
+  if (!workflow) return withChrome(`${header()}<section class="section"><p>Workflow not found.</p></section>`);
+  return withChrome(`${header()}<section class="section"><div class="card"><h2>${workflow.name}</h2><p>${workflow.flow}</p>
   <form id="workflow-form" class="form">
     ${workflow.fields.map((f) => `<input required name="${f}" placeholder="${f}" />`).join('')}
     <button class="btn" type="submit">Activate Workflow</button>
-  </form></div></section>`;
+  </form></div></section>`);
 }
 
 function dashboard() {
   const s = state();
   const t = trialInfo(s.auth);
   const active = s.activeWorkflows;
-  return `${header()}<section class="section"><h2>Dashboard</h2>
+  return withChrome(`${header()}<section class="section"><h2>Dashboard</h2>
   <div class="grid stats">
     <div class="card"><p>Trial</p><h3>${t.label}</h3></div>
     <div class="card"><p>Active Workflows</p><h3>${active.length}</h3></div>
@@ -177,7 +196,7 @@ function dashboard() {
     <li>Voice agent: business hours, script, escalation number, calendar link</li>
     <li>Complaint automation: complaint categories, tracking, refund rules</li>
   </ul></div>
-  </section>`;
+  </section>`);
 }
 
 function currentRoute() {
@@ -271,14 +290,17 @@ function bind() {
 function render() {
   const route = currentRoute();
   if (route === '/pricing') app.innerHTML = pricing();
-  else if (route === '/workflows') app.innerHTML = `${header()}${workflowCatalog()}`;
+  else if (route === '/workflows') app.innerHTML = withChrome(`${header()}${workflowCatalog()}`);
   else if (route === '/signup') app.innerHTML = authPage('signup');
   else if (route === '/login') app.innerHTML = authPage('login');
   else if (route === '/dashboard') app.innerHTML = dashboard();
   else if (route.startsWith('/workflow/')) app.innerHTML = workflowSetup(route.split('/')[2]);
   else app.innerHTML = home();
   bind();
+  updateProgressBar();
 }
 
 window.addEventListener('hashchange', render);
 render();
+
+window.addEventListener('scroll', updateProgressBar);
