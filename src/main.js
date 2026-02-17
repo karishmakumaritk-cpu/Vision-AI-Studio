@@ -2,6 +2,8 @@ import './styles.css';
 
 const app = document.querySelector('#app');
 
+const BUILD_VERSION = '2026.02.17.1';
+
 const PLANS = {
   starter: { name: 'Starter Automation Plan', price: '₹1499/month', workflows: 1, leads: 100 },
   growth: { name: 'Growth Automation Plan', price: '₹3999/month', workflows: 5, leads: 500 },
@@ -91,7 +93,10 @@ function trialInfo(auth) {
 
 function header() {
   return `<nav>
-    <a class="logo" href="#/">Vision-AI-Studio</a>
+    <div class="brand-wrap">
+      <a class="logo" href="#/">Vision-AI-Studio</a>
+      <span class="build-chip">Build ${BUILD_VERSION}</span>
+    </div>
     <div class="nav-links">
       <a href="#/">Home</a>
       <a href="#/pricing">Pricing</a>
