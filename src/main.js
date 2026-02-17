@@ -91,7 +91,7 @@ function trialInfo(auth) {
 
 function header() {
   return `<nav>
-    <a class="logo" href="#/">HerBalance AI</a>
+    <a class="logo" href="#/">Vision-AI-Studio</a>
     <div class="nav-links">
       <a href="#/">Home</a>
       <a href="#/pricing">Pricing</a>
