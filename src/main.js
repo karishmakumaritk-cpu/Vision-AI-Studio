@@ -19,35 +19,35 @@ const WORKFLOWS = [
   {
     key: 'abandoned-cart',
     name: 'Abandoned Cart Recovery',
-    image: 'https://images.pexels.com/photos/5632398/pexels-photo-5632398.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: 'https://political-sapphire-zd6iectvki.edgeone.app/ChatGPT%20Image%20Feb%2017,%202026,%2005_25_50%20AM.png',
     flow: 'Cart Add → Checkout Drop → Reminder + Offer',
     fields: ['Store URL', 'Cart Timeout (minutes)', 'Discount Code', 'Reminder Channel', 'Payment URL']
   },
   {
     key: 'complaint-automation',
     name: 'Complaint Automation',
-    image: 'https://images.pexels.com/photos/7709088/pexels-photo-7709088.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: 'https://faithful-chocolate-dzyoznjmbr.edgeone.app/ChatGPT%20Image%20Feb%2017,%202026,%2005_25_43%20AM.png',
     flow: 'Complaint → Ticket → Escalation → Resolve',
     fields: ['Complaint Categories', 'Support Team Email', 'Escalation Email', 'SLA Hours', 'Refund Rules']
   },
   {
     key: 'whatsapp-order',
     name: 'WhatsApp Order Automation',
-    image: 'https://images.pexels.com/photos/843700/pexels-photo-843700.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: 'https://hurt-blush-q0h9krbl7b.edgeone.app/ChatGPT%20Image%20Feb%2017,%202026,%2005_26_15%20AM.png',
     flow: 'Order → Payment Link → Invoice → Confirmation',
     fields: ['WhatsApp Number', 'Product Catalog URL', 'Payment Gateway', 'Invoice Email', 'Delivery Timeline']
   },
   {
     key: 'ai-voice-agent',
     name: 'AI Voice Agent',
-    image: 'https://images.pexels.com/photos/8867434/pexels-photo-8867434.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: 'https://main-salmon-8whhceuspr.edgeone.app/Feb%2017,%202026,%2005_26_06%20AM.png',
     flow: 'Call → Conversation → Booking → Calendar Update',
     fields: ['Business Hours', 'Call Script', 'Escalation Number', 'Calendar Link', 'Language']
   },
   {
     key: 'instagram-dm',
     name: 'Instagram DM Automation',
-    image: 'https://images.pexels.com/photos/50614/pexels-photo-50614.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: 'https://general-plum-2ygqdbt7ru.edgeone.app/ChatGPT%20Image%20Feb%2017,%202026,%2005_26_19%20AM.png',
     flow: 'DM → Auto Reply → Lead Save → Follow-up',
     fields: ['Instagram Handle', 'Reply Tone', 'Lead Form Link', 'Follow-up Delay', 'Offer Message']
   }
