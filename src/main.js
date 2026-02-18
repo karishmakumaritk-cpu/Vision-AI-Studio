@@ -1,6 +1,7 @@
 import './styles.css';
 
 const app = document.querySelector('#app');
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://vision-ai-studio-backend.onrender.com/api').replace(/\/$/, '');
 
 const PLANS = {
   starter: { name: 'Starter Automation Plan', price: '₹1499/month', workflows: 1, leads: 100 },
@@ -152,13 +153,39 @@ function pricing() {
 
 function authPage(type) {
   const signup = type === 'signup';
-  return withChrome(`${header()}<section class="section auth"><div class="card"><h2>${signup ? 'Signup' : 'Login'}</h2>
-  <form id="auth-form" class="form">
+  return withChrome(`${header()}<section class="section auth"><div class="card auth-card"><h2>${signup ? 'Signup' : 'Login'}</h2>
+  <p class="muted">Use password, OTP (email/phone), or Google option.</p>
+  <div class="auth-tabs">
+    <button class="btn ghost auth-tab active" data-auth-tab="password" type="button">Password</button>
+    <button class="btn ghost auth-tab" data-auth-tab="otp" type="button">OTP</button>
+    <button class="btn ghost auth-tab" data-auth-tab="google" type="button">Google</button>
+  </div>
+  <p id="auth-msg" class="auth-msg"></p>
+
+  <form id="auth-form-password" class="form auth-form-panel" data-panel="password">
     ${signup ? '<input required name="name" placeholder="Full Name" />' : ''}
     <input required type="email" name="email" placeholder="Email" />
+    ${signup ? '<input name="phone" placeholder="Phone (optional)" />' : ''}
+    <input required type="password" name="password" placeholder="Password" />
     ${signup ? '<select name="plan"><option value="starter">Starter</option><option value="growth">Growth</option><option value="pro">Pro</option></select>' : ''}
-    <button class="btn" type="submit">${signup ? 'Activate 1-Day Trial' : 'Login'}</button>
-  </form></div></section>`);
+    <button class="btn" type="submit">${signup ? 'Create Account' : 'Login'}</button>
+  </form>
+
+  <form id="auth-form-otp" class="form auth-form-panel hidden" data-panel="otp">
+    <select name="method"><option value="email">Email OTP</option><option value="phone">Phone OTP</option></select>
+    <input name="target" placeholder="Email or Phone" required />
+    ${signup ? '<input name="name" placeholder="Full Name (for new account)" />' : ''}
+    ${signup ? '<select name="plan"><option value="starter">Starter</option><option value="growth">Growth</option><option value="pro">Pro</option></select>' : ''}
+    <div class="auth-otp-row"><button class="btn ghost" type="button" id="send-otp-btn">Send OTP</button><input name="otp" placeholder="Enter OTP" /></div>
+    <button class="btn" type="submit">Verify OTP</button>
+  </form>
+
+  <form id="auth-form-google" class="form auth-form-panel hidden" data-panel="google">
+    <p class="muted">Google login button is ready. Backend OAuth config required.</p>
+    <button class="btn" type="button" id="google-login-btn">Continue with Google</button>
+  </form>
+
+  </div></section>`);
 }
 
 function workflowSetup(key) {
@@ -235,35 +262,148 @@ function runWorkflowAction(workflowKey) {
 function bind() {
   const route = currentRoute();
 
-  const authForm = document.querySelector('#auth-form');
-  if (authForm) {
-    authForm.addEventListener('submit', (e) => {
+  const authMsg = document.querySelector('#auth-msg');
+  const setAuthMsg = (text, isError = false) => {
+    if (!authMsg) return;
+    authMsg.textContent = text || '';
+    authMsg.classList.toggle('error', isError);
+  };
+
+  document.querySelectorAll('.auth-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach((x) => x.classList.remove('active'));
+      tab.classList.add('active');
+      const panel = tab.dataset.authTab;
+      document.querySelectorAll('.auth-form-panel').forEach((p) => {
+        p.classList.toggle('hidden', p.dataset.panel != panel);
+      });
+      setAuthMsg('');
+    });
+  });
+
+  const passwordForm = document.querySelector('#auth-form-password');
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const d = new FormData(authForm);
-      const s = state();
-      if (route === '/signup') {
-        s.auth = {
-          userId: `usr_${Math.random().toString(36).slice(2, 10)}`,
-          name: d.get('name'),
+      setAuthMsg('Please wait...');
+      const d = new FormData(passwordForm);
+      const payload = route === '/signup'
+        ? {
+          full_name: d.get('name'),
           email: d.get('email'),
-          plan: d.get('plan'),
-          trialStart: Date.now(),
-          trialEnd: Date.now() + 24 * 60 * 60 * 1000
-        };
-      } else {
-        if (!s.auth) {
-          s.auth = {
-            userId: `usr_${Math.random().toString(36).slice(2, 10)}`,
-            name: d.get('email').toString().split('@')[0],
-            email: d.get('email'),
-            plan: 'starter',
-            trialStart: Date.now(),
-            trialEnd: Date.now() + 24 * 60 * 60 * 1000
-          };
+          phone: d.get('phone') || null,
+          password: d.get('password'),
+          business_type: 'General'
         }
+        : { email: d.get('email'), password: d.get('password') };
+
+      try {
+        const endpoint = route === '/signup' ? '/auth/signup' : '/auth/login';
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Authentication failed');
+
+        const s = state();
+        const sub = data.data.subscription || {};
+        s.auth = {
+          token: data.data.token,
+          userId: data.data.user.id,
+          name: data.data.user.full_name,
+          email: data.data.user.email,
+          phone: data.data.user.phone || null,
+          plan: sub.plan_name || d.get('plan') || 'trial',
+          trialStart: sub.trial_start ? new Date(sub.trial_start).getTime() : Date.now(),
+          trialEnd: sub.trial_end ? new Date(sub.trial_end).getTime() : (Date.now() + 24 * 60 * 60 * 1000)
+        };
+        save(s);
+        location.hash = '#/dashboard';
+      } catch (err) {
+        setAuthMsg(err.message, true);
       }
-      save(s);
-      location.hash = '#/dashboard';
+    });
+  }
+
+  const otpForm = document.querySelector('#auth-form-otp');
+  const sendOtpBtn = document.querySelector('#send-otp-btn');
+  if (otpForm && sendOtpBtn) {
+    sendOtpBtn.addEventListener('click', async () => {
+      const d = new FormData(otpForm);
+      const method = String(d.get('method'));
+      const target = String(d.get('target') || '').trim();
+      if (!target) return setAuthMsg('Email/Phone required for OTP.', true);
+      setAuthMsg('Sending OTP...');
+      try {
+        const payload = method === 'email' ? { method, email: target } : { method, phone: target };
+        const res = await fetch(`${API_BASE}/auth/request-otp`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Failed to send OTP');
+        setAuthMsg(`OTP sent. Dev OTP: ${data.dev_otp}`);
+      } catch (err) {
+        setAuthMsg(err.message, true);
+      }
+    });
+
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const d = new FormData(otpForm);
+      const method = String(d.get('method'));
+      const target = String(d.get('target') || '').trim();
+      const otp = String(d.get('otp') || '').trim();
+      if (!target || !otp) return setAuthMsg('Target and OTP required.', true);
+      setAuthMsg('Verifying OTP...');
+      try {
+        const payload = {
+          method,
+          otp,
+          full_name: d.get('name') || undefined,
+          plan: d.get('plan') || 'starter'
+        };
+        if (method === 'email') payload.email = target;
+        else payload.phone = target;
+
+        const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'OTP verify failed');
+
+        const s = state();
+        const sub = data.data.subscription || {};
+        s.auth = {
+          token: data.data.token,
+          userId: data.data.user.id,
+          name: data.data.user.full_name,
+          email: data.data.user.email,
+          phone: data.data.user.phone || null,
+          plan: sub.plan_name || d.get('plan') || 'trial',
+          trialStart: sub.trial_start ? new Date(sub.trial_start).getTime() : Date.now(),
+          trialEnd: sub.trial_end ? new Date(sub.trial_end).getTime() : (Date.now() + 24 * 60 * 60 * 1000)
+        };
+        save(s);
+        location.hash = '#/dashboard';
+      } catch (err) {
+        setAuthMsg(err.message, true);
+      }
+    });
+  }
+
+  const googleBtn = document.querySelector('#google-login-btn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+      setAuthMsg('Checking Google auth...');
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Google login is not available yet');
+      } catch (err) {
+        setAuthMsg(err.message, true);
+      }
     });
   }
 
