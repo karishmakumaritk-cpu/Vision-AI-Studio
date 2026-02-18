@@ -68,3 +68,18 @@ CREATE TABLE IF NOT EXISTS leads (
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_workflows_user_id ON workflows(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_logs_user_id ON usage_logs(user_id);
+
+
+CREATE TABLE IF NOT EXISTS support_queries (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  name TEXT,
+  email TEXT NOT NULL,
+  query_type TEXT DEFAULT 'email_form',
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_support_queries_user_id ON support_queries(user_id);
+CREATE INDEX IF NOT EXISTS idx_support_queries_status ON support_queries(status);

@@ -43,6 +43,13 @@ router.patch('/:id/pause', async (req, res) => {
   return res.json({ success: true, message: 'Workflow paused', data });
 });
 
+
+router.patch('/:id/resume', async (req, res) => {
+  const { data, error } = await supabase.from('workflows').update({ status: 'active' }).eq('id', req.params.id).eq('user_id', req.user.id).select('*').single();
+  if (error) return res.status(500).json({ success: false, error: error.message });
+  return res.json({ success: true, message: 'Workflow resumed', data });
+});
+
 router.delete('/:id', async (req, res) => {
   const { error } = await supabase.from('workflows').delete().eq('id', req.params.id).eq('user_id', req.user.id);
   if (error) return res.status(500).json({ success: false, error: error.message });

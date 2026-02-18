@@ -34,6 +34,8 @@ app.use('/api/workflows', require('./routes/workflows'));
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/usage', require('./routes/usage'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/ai', require('./routes/ai'));
+app.use('/api/support', require('./routes/support'));
 
 const healthPayload = () => ({
   status: 'OK',
@@ -68,7 +70,9 @@ app.get('/api', (req, res) => {
       'GET /api/workflows',
       'POST /api/workflows/create',
       'GET /api/subscriptions/status',
-      'GET /api/usage/stats'
+      'GET /api/usage/stats',
+      'POST /api/ai/chat',
+      'POST /api/support/email-query'
     ]
   });
 });
