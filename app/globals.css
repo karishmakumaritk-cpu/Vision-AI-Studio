@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
+  background-image: radial-gradient(circle at 20% 0%, rgba(99, 102, 241, 0.14), transparent 35%), radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.12), transparent 35%);
 }
 
 .container-shell {
@@ -11,5 +16,73 @@ body {
 }
 
 .card {
-  @apply rounded-xl border border-slate-800 bg-slate-900/70;
+  @apply rounded-xl border border-slate-800 bg-slate-900/70 transition-all duration-300;
+}
+
+.glass-nav {
+  @apply rounded-xl border border-slate-800 bg-slate-900/65 p-4 backdrop-blur;
+}
+
+.hero-animated {
+  animation: fadeInUp 700ms ease-out both;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: -30% auto auto -10%;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.38), transparent 70%);
+  filter: blur(6px);
+  animation: floatGlow 4.5s ease-in-out infinite;
+}
+
+.feature-pop {
+  animation: popIn 550ms ease both;
+}
+
+.plan-tilt {
+  animation: fadeInUp 700ms ease both;
+}
+
+.plan-tilt:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.45);
+}
+
+.image-card {
+  animation: fadeInUp 760ms ease both;
+}
+
+.image-card:hover {
+  transform: translateY(-4px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatGlow {
+  0%,
+  100% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
 }
