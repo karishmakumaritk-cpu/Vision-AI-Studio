@@ -1,83 +1,44 @@
-# Vision AI Studio (Next.js 14 SaaS)
+# 🚀 Vision AI Studio
 
-Production-ready AI SaaS starter inspired by Tixu.ai.
+Production-ready monolith SaaS platform for AI-powered business automation.
 
-## Stack
-- Next.js 14 (App Router) + React + TypeScript
-- Tailwind CSS (ShadCN-compatible style)
-- PostgreSQL + Prisma
-- NextAuth (Google OAuth + email/password)
-- Stripe subscriptions
-- OpenAI API integration
-- Zustand state store
+## Tech Stack
+- Frontend: React + Vite + Tailwind + Framer Motion
+- Backend: Node.js + Express
+- Database: PostgreSQL / Supabase SQL schema
+- AI: OpenAI (+ optional Claude)
+- Payments: Stripe + Razorpay
 
-## Features
-- Animated landing page with local free SVG illustrations
-- Auth flow (signup/login/logout + Google OAuth)
-- Protected dashboard with sidebar navigation
-- AI prompt generator and saved prompt history
-- Billing page with Stripe checkout
-- Admin panel and admin API
-- Usage limits per plan + rate-limited AI endpoint
-
-## Folder Structure
+## Project Structure
 ```txt
-app/
-  (landing)/signin
-  (landing)/signup
-  (dashboard)/dashboard
-  (dashboard)/admin
-  api/
-components/
-  landing/
-    sections/
-  dashboard/
-lib/
-prisma/schema.prisma
-public/images/
-docs/DEPLOYMENT.md
+frontend/
+backend/
+database/
+docs/
 ```
 
-## Setup
-1. Install dependencies
+## Quick Start
+
+### Backend
 ```bash
+cd backend
 npm install
-```
-
-2. Configure environment
-```bash
 cp .env.example .env
-```
-
-3. Set up database and Prisma
-```bash
-npx prisma generate
-npx prisma migrate dev --name init
-```
-
-4. Run dev server
-```bash
 npm run dev
 ```
 
-## Deployment
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
-### Vercel
-- Framework: Next.js
-- Build command: `npm run build`
-- Install command: `npm ci`
-
-### Railway
-- Uses `railway.json` + `Dockerfile`
-
-### Docker local
+### Frontend
 ```bash
-docker compose up --build
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-## Security Notes
-- Input validation via Zod
-- Route protection via middleware + server session checks
-- Basic in-memory rate limiting (replace with Redis/Upstash in production)
-- Plan-based usage limits
+### Database
+Run `database/schema.sql`, then `database/seeds.sql` in Supabase SQL editor.
+
+## Documentation
+- [API](docs/API.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Deployment](docs/DEPLOYMENT.md)

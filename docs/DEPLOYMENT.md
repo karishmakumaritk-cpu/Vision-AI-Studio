@@ -1,20 +1,30 @@
-# Deployment Guide
+# Deployment Guide (Monolith-first)
 
-## Vercel + Supabase/Railway Postgres
-1. Push repository to Git provider.
-2. Import project in Vercel.
-3. Configure environment variables from `.env.example`.
-4. Add production database URL and run Prisma migrations:
-   - `npx prisma migrate deploy`
-5. Configure Stripe webhook endpoint:
-   - `https://<your-domain>/api/stripe/webhook`
+## 1) Database (Supabase)
+1. Create project.
+2. Run `database/schema.sql`.
+3. Run `database/seeds.sql`.
+4. Save `SUPABASE_URL` + `SUPABASE_SERVICE_KEY`.
 
-## Docker
-```bash
-docker compose up --build
-```
+## 2) Backend (Render/Railway)
+- Root: `backend`
+- Build: `npm install`
+- Start: `npm start`
+- Add env vars from `backend/.env.example`
 
-## CI suggestion
-- Run `npm ci`
-- Run `npx prisma generate`
-- Run `npm run build`
+## 3) Frontend (Vercel)
+- Root: `frontend`
+- Build: `npm run build`
+- Output: `dist`
+- Env: `VITE_API_URL=https://<backend>/api`
+
+## 4) Payments
+- Stripe webhook: `https://<backend>/api/payments/stripe/webhook`
+- Configure Razorpay keys.
+
+## 5) Production checklist
+- Secure JWT secret
+- CORS set to frontend domain
+- Rate limits enabled
+- Cron jobs active
+- Monitoring/logging configured
