@@ -1,26 +1,44 @@
-# Vision AI Studio
+# 🚀 Vision AI Studio
 
-Minimal Vite setup for deploying on Vercel.
+Production-ready monolith SaaS platform for AI-powered business automation.
 
-## Local development
+## Tech Stack
+- Frontend: React + Vite + Tailwind + Framer Motion
+- Backend: Node.js + Express
+- Database: PostgreSQL / Supabase SQL schema
+- AI: OpenAI (+ optional Claude)
+- Payments: Stripe + Razorpay
 
+## Project Structure
+```txt
+frontend/
+backend/
+database/
+docs/
+```
+
+## Quick Start
+
+### Backend
 ```bash
+cd backend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-## Build
-
+### Frontend
 ```bash
-npm run build
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-## Vercel settings
+### Database
+Run `database/schema.sql`, then `database/seeds.sql` in Supabase SQL editor.
 
-Use these values in Vercel:
-
-- Framework Preset: **Vite**
-- Root Directory: **./**
-- Install Command: **npm install**
-- Build Command: **npm run build**
-- Output Directory: **dist**
+## Documentation
+- [API](docs/API.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Deployment](docs/DEPLOYMENT.md)
