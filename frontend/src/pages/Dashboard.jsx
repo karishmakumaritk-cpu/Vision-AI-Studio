@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -35,7 +36,7 @@ export default function Dashboard() {
     void fetchData();
   }, [token]);
 
-  const getStatusColor = (s) => ({ pending: 'yellow', in_progress: 'blue', testing: 'purple', completed: 'green', cancelled: 'red' }[s] || 'gray');
+  const getStatusColor = (s) => ({ pending: '#facc15', in_progress: '#60a5fa', testing: '#c084fc', completed: '#4ade80', cancelled: '#f87171' }[s] || '#9ca3af');
   const getStatusIcon = (s) => ({ pending: Clock, in_progress: TrendingUp, testing: AlertCircle, completed: CheckCircle, cancelled: AlertCircle }[s] || Clock);
 
   if (loading) return <div className="min-h-screen bg-[#0A0A0A] grid place-items-center"><div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" /></div>;
@@ -63,13 +64,12 @@ export default function Dashboard() {
           <div className="space-y-4 mb-10">
             {projects.map((project) => {
               const Icon = getStatusIcon(project.status);
-              const color = getStatusColor(project.status);
               return (
                 <div key={project.id} className="bg-white/5 border border-white/10 rounded-xl p-5">
                   <div className="flex justify-between">
                     <div>
                       <h4 className="text-xl font-bold">{project.project_name}</h4>
-                      <div className={`text-${color}-400 text-sm flex items-center gap-2`}><Icon className="w-4 h-4" />{project.status}</div>
+                      <div className="text-sm flex items-center gap-2" style={{ color: getStatusColor(project.status) }}><Icon className="w-4 h-4" />{project.status}</div>
                     </div>
                     <div className="text-right font-black">₹{project.price_quoted?.toLocaleString?.() || '0'}</div>
                   </div>
@@ -92,6 +92,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

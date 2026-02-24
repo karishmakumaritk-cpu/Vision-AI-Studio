@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Search, ArrowRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const automationCategories = [
   { id: 'lead-conversion', name: 'AI Lead Conversion Engine', category: 'Business Automation', emoji: '🎯', description: 'Lead qualification + follow-up + CRM', price: { min: 15000, max: 35000 }, delivery: '7-10 days' },
@@ -36,7 +37,6 @@ const categories = ['All', ...new Set(automationCategories.map((a) => a.category
 export default function Automations() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-
   const filtered = automationCategories.filter((a) => (selectedCategory === 'All' || a.category === selectedCategory) && (a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.description.toLowerCase().includes(searchQuery.toLowerCase())));
 
   return (
@@ -66,6 +66,7 @@ export default function Automations() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

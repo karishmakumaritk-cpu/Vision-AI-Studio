@@ -5,6 +5,7 @@ import { Send, Loader, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -83,6 +84,7 @@ export default function RequestAutomation() {
           <button disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl py-3 font-bold flex items-center justify-center gap-2">{loading ? <Loader className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}Submit Request</button>
         </form>
       </div>
+      <Footer />
     </div>
   );
 }

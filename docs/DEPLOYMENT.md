@@ -33,3 +33,9 @@ For project ref `pcrtgcyqryafuautfctg`:
 - Migration URL can use direct host `db.pcrtgcyqryafuautfctg.supabase.co:5432`
 
 If you set `SUPABASE_URL` to a `postgresql://...` string, backend auth/data calls will fail.
+
+
+## Notifications Setup
+- Gmail (for owner email alerts): set `GMAIL_USER`, `GMAIL_APP_PASSWORD` in backend env.
+- Twilio WhatsApp (for +91 9818691915 alerts): set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`.
+- Endpoint used by frontend request form: `POST /api/automation/request`.

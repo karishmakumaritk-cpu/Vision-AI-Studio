@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AIAssistant from '../components/AIAssistant';
+import Footer from '../components/Footer';
 
 export default function Landing() {
   return (
@@ -34,6 +35,7 @@ export default function Landing() {
         </div>
       </section>
       <AIAssistant />
+      <Footer />
     </div>
   );
 }
