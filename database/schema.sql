@@ -102,3 +102,30 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   ip_address INET,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+
+CREATE TABLE IF NOT EXISTS automation_requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  automation_category TEXT NOT NULL,
+  business_type TEXT,
+  description TEXT NOT NULL,
+  estimated_price DECIMAL(10,2),
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  automation_request_id UUID REFERENCES automation_requests(id) ON DELETE SET NULL,
+  project_name TEXT NOT NULL,
+  price_quoted DECIMAL(10,2),
+  price_paid DECIMAL(10,2),
+  progress_percentage INTEGER DEFAULT 0,
+  status TEXT DEFAULT 'in_progress',
+  notes TEXT,
+  n8n_workflow_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP
+);

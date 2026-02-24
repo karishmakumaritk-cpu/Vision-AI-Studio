@@ -23,3 +23,11 @@
 ## Admin
 - `GET /api/admin/users`
 - `GET /api/admin/revenue`
+
+
+## Automation Marketplace
+- `GET /api/automations` (frontend-only catalog in this scaffold)
+- `POST /api/automation/request`
+- `GET /api/automation/my-requests`
+- `GET /api/projects`
+- `POST /api/ai/chat`

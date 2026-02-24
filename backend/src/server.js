@@ -20,6 +20,9 @@ app.use('/api/products', require('./routes/products.routes'));
 app.use('/api/workflows', require('./routes/workflows.routes'));
 app.use('/api/payments', require('./routes/payments.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
+app.use('/api/ai', require('./routes/ai.routes'));
+app.use('/api/projects', require('./routes/projects.routes'));
+app.use('/api/automation', require('./routes/automation.routes'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'OK', timestamp: new Date().toISOString() }));
 app.get('/', (_req, res) => res.json({ service: 'Vision AI Studio API', status: 'running' }));

@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Pricing from './pages/Pricing';
 import Admin from './pages/Admin';
+import Automations from './pages/Automations';
+import RequestAutomation from './pages/RequestAutomation';
 
 function Protected({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
@@ -20,6 +22,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/automations" element={<Automations />} />
+      <Route path="/request" element={<RequestAutomation />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
       <Route path="/products" element={<Products />} />
