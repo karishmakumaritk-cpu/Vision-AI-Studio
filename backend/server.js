@@ -15,15 +15,19 @@ app.post('/api/auth/register', async (req, res) => {
   return res.json({ ok: true, message: 'register endpoint reached (placeholder)' });
 });
 
+let openaiClient = null;
+
 app.post('/api/ai/generate', async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI API key not configured' });
   try {
-    const { OpenAI } = await import('openai');
-    const client = new OpenAI({ apiKey });
+    if (!openaiClient) {
+      const { OpenAI } = await import('openai');
+      openaiClient = new OpenAI({ apiKey });
+    }
     // TODO: Replace with actual prompt handling and model call. Example (commented):
-    // const completion = await client.responses.create({ model: 'gpt-4o-mini', input: req.body.prompt || 'Hello' });
-    // return res.json({ ok: true, completion: completion.output?.[0]?.content?.[0]?.text || completion });
+    // const completion = await openaiClient.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: req.body.prompt || 'Hello' }] });
+    // return res.json({ ok: true, completion: completion.choices?.[0]?.message?.content || completion });
     return res.json({ ok: true, message: 'OpenAI client initialized (placeholder)' });
   } catch (err) {
     console.error('OpenAI import or call failed', err);
