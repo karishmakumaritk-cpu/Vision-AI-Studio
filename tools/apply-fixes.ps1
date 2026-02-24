@@ -170,7 +170,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --prefer-offline --no-audit --progress=false
+          npm install --prefer-offline --no-audit --progress=false
 
       - name: Run ESLint (auto-fix)
         run: |

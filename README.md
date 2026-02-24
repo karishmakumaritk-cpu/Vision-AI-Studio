@@ -110,7 +110,7 @@ You should see package.json listed. If not, `cd` into the correct directory.
 
 - For the monorepo root (Next.js app):
   PS> cd C:\path\to\Vision-AI-Studio
-  PS> npm ci
+  PS> npm install
   PS> npm run dev
 
 - For the Vite frontend (if using frontend/ folder):
@@ -150,7 +150,7 @@ Windows (PowerShell)
    # should return True
 
 3) Install root dependencies and run Next (if using Next at root):
-   PS> npm ci
+  PS> npm install
    PS> npm run dev
    # Next dev runs at http://localhost:3000 by default
 
@@ -175,7 +175,7 @@ macOS / Linux (bash)
    $ pwd
    $ ls package.json
 3) Install & run root Next app:
-   $ npm ci
+  $ npm install
    $ npm run dev
 
 Docker (if you prefer containerized)
@@ -215,4 +215,4 @@ The script will:
 
 When the script prints the project path, run:
   cd "C:\full\path\to\Vision-AI-Studio"
-Then run the appropriate install/start commands described earlier (e.g., `npm ci` and `npm run dev` at project root).
+Then run the appropriate install/start commands described earlier (e.g., `npm install` and `npm run dev` at project root).
