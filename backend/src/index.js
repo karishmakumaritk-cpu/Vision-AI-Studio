@@ -22,6 +22,33 @@ app.post('/api/ai/chat', async (req, res) => {
   res.json({ success: true, data: { reply } });
 });
 
+// AI generate endpoint with lazy OpenAI initialization
+app.post('/api/ai/generate', async (req, res) => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'OpenAI API key not configured' });
+  }
+  const { prompt } = req.body;
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+    return res.status(400).json({ error: 'prompt is required and must be a non-empty string' });
+  }
+  try {
+    const { OpenAI } = await import('openai');
+    const client = new OpenAI({ apiKey });
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt.trim() }],
+      max_tokens: 256,
+    });
+    res.json({ success: true, data: { reply: completion.choices[0]?.message?.content } });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'AI generation failed' });
+  }
+});
+
+// placeholder endpoint for auth register (backwards compatibility)
+app.post('/api/auth/register', (req, res) => res.json({ success: true, message: 'Registration placeholder — use Supabase auth on the client.' }));
+
 // placeholder endpoints used by frontend (projects and requests)
 app.get('/api/projects', (req, res) => res.json({ success: true, data: [] }));
 app.get('/api/automation/my-requests', (req, res) => res.json({ success: true, data: [] }));

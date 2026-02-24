@@ -15,7 +15,11 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "smoke-test": "node tools/smoke-test.js",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "start:frontend": "cd frontend && npm run preview",
+    "start:backend": "node backend/src/index.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

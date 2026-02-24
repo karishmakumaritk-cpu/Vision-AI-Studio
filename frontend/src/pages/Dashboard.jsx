@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Package } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export default function Dashboard() {
+  const nav = useNavigate();
+  const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiResult, setAiResult] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { nav('/login'); return; }
+      setUser(session.user);
+    });
+
     (async () => {
       try {
         const [pRes, rRes] = await Promise.all([axios.get(`${API_URL}/projects`), axios.get(`${API_URL}/automation/my-requests`)]);
@@ -21,7 +32,21 @@ export default function Dashboard() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [nav]);
+
+  const handleAiSubmit = async (e) => {
+    e.preventDefault();
+    setAiLoading(true);
+    setAiResult(null);
+    try {
+      const res = await axios.post(`${API_URL}/ai/generate`, { prompt: aiPrompt });
+      setAiResult(res.data);
+    } catch (err) {
+      setAiResult(err.response?.data || { error: 'Request failed' });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
 
@@ -29,6 +54,7 @@ export default function Dashboard() {
     <div style={{ paddingTop: 96, background: '#0A0A0A', minHeight: '100vh', color: '#fff' }}>
       <div className="container">
         <h1 style={{ fontSize: 28 }}>Your Dashboard</h1>
+        {user && <p style={{ color: '#9ca3af', marginBottom: 16 }}>Signed in as: {user.email}</p>}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginTop: 16 }}>
           <div style={{ background: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 8 }}>
@@ -48,6 +74,31 @@ export default function Dashboard() {
             <div style={{ fontSize: 20, fontWeight: 800 }}>₹{projects.reduce((s, p) => s + (p.price_paid || 0), 0).toLocaleString()}</div>
           </div>
         </div>
+
+        <section style={{ marginTop: 24, background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 8 }}>
+          <h2 style={{ marginBottom: 12 }}>AI Generate</h2>
+          <form onSubmit={handleAiSubmit} style={{ display: 'flex', gap: 8 }}>
+            <input
+              style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '8px 12px', color: '#fff' }}
+              placeholder="Enter a prompt..."
+              aria-label="AI prompt"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+            />
+            <button
+              type="submit"
+              disabled={aiLoading || !aiPrompt}
+              style={{ background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}
+            >
+              {aiLoading ? 'Generating...' : 'Generate'}
+            </button>
+          </form>
+          {aiResult && (
+            <pre style={{ marginTop: 12, background: 'rgba(0,0,0,0.4)', padding: 12, borderRadius: 6, fontSize: 12, overflowX: 'auto', whiteSpace: 'pre-wrap' }}>
+              {JSON.stringify(aiResult, null, 2)}
+            </pre>
+          )}
+        </section>
 
         <section style={{ marginTop: 24 }}>
           <h2>Active Projects</h2>
