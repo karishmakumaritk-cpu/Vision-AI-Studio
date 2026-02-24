@@ -216,3 +216,54 @@ The script will:
 When the script prints the project path, run:
   cd "C:\full\path\to\Vision-AI-Studio"
 Then run the appropriate install/start commands described earlier (e.g., `npm install` and `npm run dev` at project root).
+
+## Authentication & AI quickstart
+
+### Local dev
+
+1. Create a local `.env` file (do **NOT** commit) with the following variables (replace with your values):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+OPENAI_API_KEY=
+NEXT_PUBLIC_API_URL=http://localhost:10000
+```
+
+2. Install dependencies from repo root:
+```bash
+npm install
+```
+
+3. Start the backend (Express + lazy OpenAI):
+```bash
+npm run start:backend
+# Listens on PORT (default 10000)
+```
+
+4. Start the Next.js frontend pages (signup / login / dashboard):
+```bash
+npm run dev:frontend
+# Runs at http://localhost:3000
+```
+
+5. Open http://localhost:3000/signup to create an account, then http://localhost:3000/login to sign in. After login you will be redirected to http://localhost:3000/dashboard where you can send prompts to the AI endpoint.
+
+### Pages added
+
+| Path | File |
+|---|---|
+| `/signup` | `frontend/pages/signup.jsx` |
+| `/login` | `frontend/pages/login.jsx` |
+| `/dashboard` | `frontend/pages/dashboard.jsx` |
+
+### Backend endpoints (backend/server.js)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/health` | Health check |
+| POST | `/api/auth/register` | Placeholder — TODO: Supabase service-role creation |
+| POST | `/api/ai/generate` | Lazily imports OpenAI — TODO: wire real model call |
+
+> **Security note:** Never commit `.env` or any file containing real secrets. Rotate any key that is accidentally exposed.
