@@ -2,6 +2,24 @@
 
 Vision AI Studio is a single-monolith SaaS platform designed for fast go-to-market.
 
+## Supabase Auth + AI Backend (new in this PR)
+
+### Local dev
+
+1. Create `.env` with the variables from `.env.example` (do **not** commit secrets).
+2. `npm install`
+3. `npm run dev:frontend` — serves the Next.js frontend (pages at `frontend/pages/`)
+4. `npm run start:backend` — serves the Express backend (`backend/server.js`)
+5. Visit `http://localhost:3000/signup` and `/login` — use the pages added in this PR.
+6. After login, visit `/dashboard` and test the AI generate form.
+
+### Deployed
+
+- **Frontend (Vercel):** set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_API_URL` in Vercel environment variables.
+- **Backend (Render):** set `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY`. Set start command to `node backend/server.js` or `npm run start:backend`.
+
+---
+
 ## Structure
 
 - `frontend/` React + Vite app (Landing, auth, dashboard, admin)
