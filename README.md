@@ -1,26 +1,49 @@
-# Vision AI Studio
+# Vision AI Studio - Production Monolith SaaS
 
-Minimal Vite setup for deploying on Vercel.
+Vision AI Studio is a single-monolith SaaS platform designed for fast go-to-market.
 
-## Local development
+## Structure
 
+- `frontend/` React + Vite app (Landing, auth, dashboard, admin)
+- `backend/` Express API (auth, products, workflows, payments, admin)
+- `database/` Supabase SQL schema and seeds
+- `docs/` architecture, API, deployment docs
+
+## Quick Start
+
+### Backend
 ```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+### Frontend
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-## Build
+### Database
+Run SQL files in Supabase SQL editor:
+- `database/schema.sql`
+- `database/seeds.sql`
 
-```bash
-npm run build
-```
+## Production Notes
+- JWT auth + role-based admin routes
+- Trial/subscription-aware workflow middleware
+- Stripe + Razorpay payment endpoints
+- OpenAI-backed workflow service
+- Cron hooks for trial expiration checks
 
-## Vercel settings
+See docs in `docs/` for API and deployment details.
 
-Use these values in Vercel:
 
-- Framework Preset: **Vite**
-- Root Directory: **./**
-- Install Command: **npm install**
-- Build Command: **npm run build**
-- Output Directory: **dist**
+## Supabase URI Error Fix
+If your URI shows connection/auth errors, ensure:
+- `sslmode=require` is present
+- password is URL-encoded
+- runtime uses Supabase pooler (`port 6543`)
+- direct host (`db.<ref>.supabase.co:5432`) is used only when required for migrations.
