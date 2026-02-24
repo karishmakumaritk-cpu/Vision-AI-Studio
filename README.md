@@ -82,6 +82,8 @@ Run SQL files in Supabase SQL editor:
 
 See docs in `docs/` for API and deployment details.
 
+A public merchant info page is available at `/merchant`; set the merchant ID for your deployment via the `NEXT_PUBLIC_MERCHANT_ID` environment variable in your deployment secrets.
+
 
 ## Supabase URI Error Fix
 If your URI shows connection/auth errors, ensure:
