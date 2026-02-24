@@ -221,16 +221,13 @@ Then run the appropriate install/start commands described earlier (e.g., `npm in
 
 ### Local dev
 
-1. Create a local `.env` file (do **NOT** commit) with the following variables (replace with your values):
+1. Create local env files (do **NOT** commit) with the following variables (replace with your values):
 
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-OPENAI_API_KEY=
-NEXT_PUBLIC_API_URL=http://localhost:10000
-```
-
+   **Frontend (public) env — used by the React/Next.js app only:**
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   NEXT_PUBLIC_API_URL=http://localhost:10000
 2. Install dependencies from repo root:
 ```bash
 npm install
