@@ -7,61 +7,79 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'assistant', content: `👋 Hi! I can help with automations, pricing, and contact.` }]);
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: `👋 Hi! I'm your AI assistant. I can help you with:
+
+• Browse 24 automation categories
+• Calculate pricing estimates
+• Explain how automations work
+• Connect you with Karishma
+• Guide you through the process
+
+What can I help you with today?`
+    }
+  ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const endRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages]);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-  const getFallbackResponse = (message) => {
-    const lower = message.toLowerCase();
-    if (lower.includes('price')) return '💰 Pricing: simple ₹8K-15K, medium ₹15K-30K, high ₹30K-60K.';
-    if (lower.includes('contact') || lower.includes('karishma')) return '📧 karishmakumaritk@gmail.com • 📱 +91 98186 91915';
-    return 'I can explain categories, estimate pricing, and guide your request form.';
-  };
+  const quickActions = [
+    '🎯 Show me lead automation',
+    '💰 Estimate pricing',
+    '📞 How to contact Karishma?',
+    '🤖 What automations are available?'
+  ];
 
   const handleSend = async (text = input) => {
-    const msg = text.trim();
-    if (!msg || loading) return;
+    if (!text.trim() || loading) return;
+    const userMessage = text.trim();
     setInput('');
-    setMessages((p) => [...p, { role: 'user', content: msg }]);
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setLoading(true);
+
     try {
-      const res = await axios.post(`${API_URL}/ai/chat`, { message: msg, context: 'automation_marketplace' });
-      setMessages((p) => [...p, { role: 'assistant', content: res.data?.data?.reply || getFallbackResponse(msg) }]);
-    } catch {
-      setMessages((p) => [...p, { role: 'assistant', content: getFallbackResponse(msg) }]);
-    } finally {
-      setLoading(false);
-    }
+      const res = await axios.post(`${API_URL}/ai/chat`, { message: userMessage, context: 'automation_marketplace' });
+      setMessages(prev => [...prev, { role: 'assistant', content: res.data.data.reply }]);
+    } catch (error) {
+      // Fallback local response
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not reach the AI service. Try the Request form.' }]);
+    } finally { setLoading(false); }
   };
 
   return (
     <>
-      <motion.button onClick={() => setIsOpen(!isOpen)} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full shadow-2xl flex items-center justify-center">
-        {isOpen ? <X className="w-6 h-6 text-white" /> : <MessageCircle className="w-6 h-6 text-white" />}
+      <motion.button onClick={() => setIsOpen(!isOpen)} whileHover={{ scale: 1.05 }} style={{ position: 'fixed', right: 18, bottom: 18, width: 56, height: 56, borderRadius: 999, background: 'linear-gradient(90deg,#7c3aed,#06b6d4)', border: 'none', color: '#fff', zIndex: 50 }}>
+        {isOpen ? <X /> : <MessageCircle />}
       </motion.button>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="fixed bottom-24 right-6 z-40 w-96 max-w-[calc(100vw-3rem)] h-[540px] bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-cyan-600 p-4 flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-white" />
-              <h3 className="font-bold text-white">AI Assistant</h3>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} style={{ position: 'fixed', right: 18, bottom: 88, width: 360, height: 520, background: '#071128', borderRadius: 12, overflow: 'hidden', zIndex: 50 }}>
+            <div style={{ padding: 12, background: 'linear-gradient(90deg,#7c3aed,#06b6d4)', color: '#fff', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 999, background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles /></div>
+              <div style={{ fontWeight: 700 }}>AI Assistant</div>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`${m.role === 'user' ? 'bg-gradient-to-r from-purple-600 to-cyan-600' : 'bg-white/5 border border-white/10'} max-w-[80%] px-4 py-2 rounded-2xl text-sm whitespace-pre-line`}>{m.content}</div>
+
+            <div style={{ padding: 12, height: 'calc(100% - 120px)', overflow: 'auto' }}>
+              {messages.map((msg, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 8 }}>
+                  <div style={{ maxWidth: '80%', padding: 8, borderRadius: 12, background: msg.role === 'user' ? 'linear-gradient(90deg,#7c3aed,#06b6d4)' : 'rgba(255,255,255,0.04)', color: msg.role === 'user' ? '#fff' : '#e5e7eb' }}>
+                    <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
+                  </div>
                 </div>
               ))}
-              {loading && <Loader className="w-5 h-5 animate-spin text-purple-400" />}
-              <div ref={endRef} />
+
+              {loading && <div style={{ padding: 8, borderRadius: 12, background: 'rgba(255,255,255,0.04)' }}><Loader /></div>}
+              <div ref={messagesEndRef} />
             </div>
-            <div className="p-4 border-t border-white/10 flex gap-2">
-              <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask me anything..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm" />
-              <button onClick={() => handleSend()} disabled={loading || !input.trim()} className="w-10 h-10 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full flex items-center justify-center disabled:opacity-50"><Send className="w-4 h-4" /></button>
+
+            <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', gap: 8 }}>
+              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Ask me anything..." style={{ flex: 1, padding: 8, borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }} />
+              <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{ padding: '8px 12px', borderRadius: 8, background: 'linear-gradient(90deg,#7c3aed,#06b6d4)', color: '#fff', border: 'none' }}><Send /></button>
             </div>
           </motion.div>
         )}

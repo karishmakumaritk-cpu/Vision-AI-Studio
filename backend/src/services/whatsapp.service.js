@@ -1,28 +1,29 @@
 const axios = require('axios');
 
-exports.sendAutomationRequestWhatsApp = async ({ name, automation, estimatedPrice }) => {
-  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-    return { skipped: true, reason: 'Missing Twilio credentials' };
+exports.sendWhatsAppNotification = async (customerData) => {
+  const { name, automation, estimatedPrice } = customerData;
+
+  const message = `🚀 New Automation Request\n\nCustomer: ${name}\nAutomation: ${automation}\nEstimated: ₹${estimatedPrice}\n\nCheck email for full details.`;
+
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886';
+  const to = process.env.NOTIFY_WHATSAPP_TO || 'whatsapp:+919818691915';
+
+  if (!sid || !token) {
+    console.warn('Twilio creds missing, skipping WhatsApp send.');
+    return;
   }
 
-  const body = `🚀 New Automation Request\nCustomer: ${name}\nAutomation: ${automation}\nEstimated: ₹${estimatedPrice}`;
-  const form = new URLSearchParams({
-    From: 'whatsapp:+14155238886',
-    To: 'whatsapp:+919818691915',
-    Body: body
-  });
-
-  await axios.post(
-    `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`,
-    form,
+  await axios.post(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
+    new URLSearchParams({
+      From: from,
+      To: to,
+      Body: message
+    }),
     {
-      auth: {
-        username: process.env.TWILIO_ACCOUNT_SID,
-        password: process.env.TWILIO_AUTH_TOKEN
-      },
+      auth: { username: sid, password: token },
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }
   );
-
-  return { success: true };
 };

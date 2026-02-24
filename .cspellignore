@@ -1,0 +1,12 @@
+node_modules
+.next
+frontend/node_modules
+backend/node_modules
+public
+**/*.png
+**/*.jpg
+**/*.svg
+**/*.ico
+**/*.lock
+**/*.log
+**/.git

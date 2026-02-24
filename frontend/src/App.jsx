@@ -1,5 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import AIAssistant from './components/AIAssistant';
 import Landing from './pages/Landing';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -9,6 +12,7 @@ import Pricing from './pages/Pricing';
 import Admin from './pages/Admin';
 import Automations from './pages/Automations';
 import RequestAutomation from './pages/RequestAutomation';
+import Home from './pages/Home';
 
 function Protected({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
@@ -20,17 +24,21 @@ function Protected({ children, adminOnly = false }) {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/automations" element={<Automations />} />
-      <Route path="/request" element={<RequestAutomation />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
-      <Route path="/admin" element={<Protected adminOnly><Admin /></Protected>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/automations" element={<Automations />} />
+        <Route path="/request" element={<RequestAutomation />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/admin" element={<Protected adminOnly><Admin /></Protected>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <AIAssistant />
+    </BrowserRouter>
   );
 }

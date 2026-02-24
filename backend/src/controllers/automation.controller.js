@@ -1,38 +1,45 @@
 const supabase = require('../config/supabase');
-const { sendAutomationRequestEmail } = require('../services/email.service');
-const { sendAutomationRequestWhatsApp } = require('../services/whatsapp.service');
+const { sendAutomationRequest } = require('../services/email.service');
+const { sendWhatsAppNotification } = require('../services/whatsapp.service');
 
 exports.submitAutomationRequest = async (req, res) => {
   try {
-    const { name, email, phone, automation_category, business_type, description, estimated_price } = req.body;
-    const userId = req.user?.userId || null;
-
-    const { data, error } = await supabase
-      .from('automation_requests')
-      .insert([{ user_id: userId, automation_category, business_type, description, estimated_price }])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    await sendAutomationRequestEmail({
+    const {
       name,
       email,
       phone,
-      automation: automation_category,
+      automation_category,
+      business_type,
       description,
-      estimatedPrice: estimated_price
+      estimated_price
+    } = req.body;
+
+    let requestRecord = null;
+    if (supabase && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+      const { data, error } = await supabase.from('automation_requests').insert([{
+        user_id: null,
+        automation_category,
+        business_type,
+        description,
+        estimated_price
+      }]).select().single();
+
+      if (error) console.warn('Supabase insert error:', error);
+      requestRecord = data;
+    }
+
+    await sendAutomationRequest({
+      name, email, phone, automation: automation_category, description, estimatedPrice: estimated_price
     });
 
-    await sendAutomationRequestWhatsApp({
-      name,
-      automation: automation_category,
-      estimatedPrice: estimated_price
+    await sendWhatsAppNotification({
+      name, automation: automation_category, estimatedPrice: estimated_price
     });
 
-    res.json({ success: true, data, message: 'Request submitted successfully' });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message || 'Failed to submit request' });
+    res.json({ success: true, message: 'Request submitted', data: requestRecord });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Failed to submit request' });
   }
 };
 

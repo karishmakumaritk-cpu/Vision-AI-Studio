@@ -1,18 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import App from './App';
-import { AuthProvider } from './context/AuthContext';
-import './index.css';
+import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
+import './styles.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
-);
+const rootEl = document.getElementById('app');
+if (rootEl) {
+  createRoot(rootEl).render(<App />);
+} else {
+  console.error('Mount element #app not found');
+}
