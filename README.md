@@ -216,3 +216,53 @@ The script will:
 When the script prints the project path, run:
   cd "C:\full\path\to\Vision-AI-Studio"
 Then run the appropriate install/start commands described earlier (e.g., `npm install` and `npm run dev` at project root).
+
+## Authentication & AI quickstart
+
+This project includes Supabase-based frontend authentication and a minimal Express backend with lazy OpenAI initialization.
+
+### Local development
+
+1. Copy `.env.example` to `.env` (do **not** commit this file) and fill in your values:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=<your Supabase project URL>
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your Supabase anon key>
+   SUPABASE_SERVICE_ROLE_KEY=<your Supabase service role key>
+   OPENAI_API_KEY=<your OpenAI API key>
+   NEXT_PUBLIC_API_URL=http://localhost:10000
+   ```
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Start the Express backend:
+   ```
+   npm run start:backend
+   ```
+4. In a separate terminal, start the Next.js frontend:
+   ```
+   npm run dev
+   ```
+5. Visit `http://localhost:3000/signup` to create an account, then `http://localhost:3000/login` to sign in.
+
+### Auth pages
+
+| Route | File |
+|-------|------|
+| `/signup` | `frontend/pages/signup.jsx` |
+| `/login` | `frontend/pages/login.jsx` |
+| `/dashboard` | `frontend/pages/dashboard.jsx` |
+
+The Supabase client is initialised in `frontend/supabaseClient.js` using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+### Backend AI endpoint
+
+`backend/server.js` exposes:
+
+- `GET /health` – liveness check
+- `POST /api/auth/register` – placeholder (TODO: wire to Supabase service-role key)
+- `POST /api/ai/generate` – lazy-initialises the OpenAI client from `OPENAI_API_KEY` and returns a placeholder response (TODO: add real prompt handling)
+
+### Deployment
+
+Set the same environment variables in your hosting provider (Vercel for the frontend, Render/Railway for the backend). Make sure `NEXT_PUBLIC_API_URL` points to the deployed backend URL.
