@@ -27,8 +27,18 @@ function Write-Backup {
 $repoRoot = Get-Location
 Write-Host "Applying curated fixes in $repoRoot`n"
 
+# Ensure script is being run from a repo-like folder (has package.json or .git)
+if (-not (Test-Path (Join-Path $repoRoot 'package.json') -or Test-Path (Join-Path $repoRoot '.git'))) {
+  Write-Host "WARNING: I don't see package.json or .git in the current folder: $repoRoot" -ForegroundColor Yellow
+  $confirm = Read-Host "Continue anyway? (y/N)"
+  if ($confirm -notmatch '^[Yy]') {
+    Write-Host "Aborting. Please run this from your repository root (the folder containing package.json) and re-run this script." -ForegroundColor Red
+    exit 1
+  }
+}
+
 $files = @{
-    "package.json" = @'
+    "package.json" = @"
 {
   "name": "vision-ai-studio",
   "version": "2.0.0",
@@ -80,37 +90,120 @@ $files = @{
     "typescript": "^5.6.2"
   }
 }
-'@
+"@
 
-    "cspell.json" = @'
+    "cspell.json" = @"
 {
   "version": "0.2",
   "language": "en",
   "words": [
-    "NextAuth",
-    "supabase",
-    "Supabase",
-    "pgbouncer",
-    "Vercel",
-    "Render",
-    "whatsapp",
-    "WhatsApp",
-    "Razorpay",
-    "sqlx",
-    "Prisma",
     "Ai",
-    "AIAssistant",
     "AIA",
-    "Stripe",
-    "postcss",
-    "vite",
+    "AIAssistant",
+    "axios",
+    "cspell",
     "framer",
     "lucide",
+    "nextauth",
+    "NextAuth",
+    "nodejs",
+    "pgbouncer",
+    "pooler",
+    "postcss",
+    "Prisma",
+    "Razorpay",
+    "Render",
+    "sqlx",
+    "stefanzweifel",
+    "Stripe",
+    "supabase",
+    "Supabase",
+    "Vercel",
+    "vite",
+    "whatsapp",
+    "WhatsApp",
     "zod",
     "zustand",
-    "nextauth",
-    "nodejs",
-    "cspell"
+    "hookform",
+    "resolvers",
+    "react-hook-form",
+    "react",
+    "react-dom",
+    "next",
+    "next-auth",
+    "prisma",
+    "prisma-client",
+    "@prisma",
+    "@next-auth",
+    "@types",
+    "typescript",
+    "autoprefixer",
+    "bcryptjs",
+    "clsx",
+    "lucide-react",
+    "openai",
+    "stripe",
+    "tailwindcss",
+    "undici",
+    "undici-types",
+    "csstype",
+    "browserslist",
+    "caniuse",
+    "fraction.js",
+    "postcss-value-parser",
+    "baseline-browser-mapping",
+    "electron-to-chromium",
+    "node-releases",
+    "eslint",
+    "eslint-config-next",
+    "@eslint-community",
+    "ajv",
+    "chalk",
+    "cross-spawn",
+    "debug",
+    "doctrine",
+    "espree",
+    "esquery",
+    "esutils",
+    "fast-deep-equal",
+    "file-entry-cache",
+    "find-up",
+    "glob-parent",
+    "graphemer",
+    "imurmurhash",
+    "is-glob",
+    "js-yaml",
+    "levn",
+    "lodash.merge",
+    "minimatch",
+    "natural-compare",
+    "optionator",
+    "strip-ansi",
+    "text-table",
+    "import-fresh",
+    "strip-json-comments",
+    "fastq",
+    "run-parallel",
+    "fast-json-stable-stringify",
+    "uri-js",
+    "ansi-styles",
+    "supports-color",
+    "@typescript-eslint",
+    "eslint-plugin-react",
+    "eslint-plugin-import",
+    "eslint-plugin-jsx-a11y",
+    "chokidar",
+    "jiti",
+    "micromatch",
+    "fast-glob",
+    "picomatch",
+    "postcss-import",
+    "sucrase",
+    "json5",
+    "prettier",
+    "uuid",
+    "preact",
+    "scheduler"
   ],
   "allowCompoundWords": true,
   "ignorePaths": [
@@ -129,9 +222,9 @@ $files = @{
     "**/.git/**"
   ]
 }
-'@
+"@
 
-    ".cspellignore" = @'
+    ".cspellignore" = @"
 node_modules
 .next
 frontend/node_modules
@@ -143,8 +236,8 @@ public
 **/*.ico
 **/*.lock
 **/*.log
-**/.git
-'
+.git
+"@
 
     ".github/workflows/code-quality.yml" = @'
 name: Code Quality (spellcheck + eslint fix)
@@ -180,31 +273,21 @@ jobs:
         run: |
           npx cspell "**/*" --no-must-find-files || true
 
-      - name: Commit fixes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'chore(code-quality): run eslint --fix and cspell'
-          file_pattern: '. '
-          branch: ${{ github.ref_name }}
-          author_name: 'github-actions[bot]'
-          author_email: '41898282+github-actions[bot]@users.noreply.github.com'
-'
-    
-    
-    
-    
-'
+# Note: this workflow does not auto-commit fixes to the repo. If you want auto-commit
+# add a separate action with appropriate permissions. Committing from GitHub Actions
+# often requires special handling of tokens and branch policies.
+'@
 
-    "vercel.json" = @'
+    "vercel.json" = @"
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "outputDirectory": ".next"
 }
-'
+"@
 
-    "docs/DEPLOYMENT.md" = @'
+    "docs/DEPLOYMENT.md" = @"
 # Deployment
 
 ## Frontend (Vercel)
@@ -273,10 +356,9 @@ Set the server-only variables in your host (Vercel/Render) as protected secrets 
 - Gmail (for owner email alerts): set `GMAIL_USER`, `GMAIL_APP_PASSWORD` in backend env.
 - Twilio WhatsApp (for +91 9818691915 alerts): set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`.
 - Endpoint used by frontend request form: `POST /api/automation/request`.
-'
+"@
 
-    "README.md" = @'
-````markdown
+    "README.md" = @"
 # Vision AI Studio - Production Monolith SaaS
 
 Vision AI Studio is a single-monolith SaaS platform designed for fast go-to-market.
@@ -364,8 +446,7 @@ IMPORTANT: secrets safety
 
 - Never paste real API keys, service role keys, database passwords, or other secrets into public chat, issues, or commit messages. If any secret has been exposed, rotate it immediately in the provider dashboard (Supabase, Stripe, Twilio, OpenAI, etc.) and update the deployment environment variables.
 
-````
-'
+"@
 
 }
 
@@ -380,4 +461,26 @@ foreach ($relPath in $files.Keys) {
     Write-Host "Wrote: $absPath`n"
 }
 
-Write-Host "Done. Please inspect the files, run 'git status' and commit the changes if they look good."
+# Offer an optional, safe repo-wide replacement for any remaining `npm ci` occurrences.
+$doReplace = Read-Host "Replace remaining 'npm ci' with 'npm install' across common repo files? (y/N)"
+if ($doReplace -match '^[Yy]') {
+  Write-Host "Searching for files to patch..."
+  $includes = @('*.yml','*.yaml','*.ps1','README.md','Dockerfile','*.json','*.sh','*.txt')
+  $candidates = Get-ChildItem -Recurse -File -Include $includes -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -notmatch '\\node_modules\\' -and $_.FullName -notmatch '\\.git\\' -and $_.FullName -notmatch '\\.next\\' }
+  foreach ($f in $candidates) {
+    try {
+      $txt = Get-Content -Path $f.FullName -Raw -ErrorAction Stop
+    } catch {
+      continue
+    }
+    if ($txt -match '\bnpm ci\b') {
+      $new = $txt -replace '\bnpm ci\b','npm install'
+      Set-Content -Path $f.FullName -Value $new -Encoding UTF8
+      Write-Host "Patched: $($f.FullName)"
+    }
+  }
+  Write-Host "Search/replace complete.`n"
+}
+
+Write-Host "Done. Please inspect the files, run 'git status' and commit the changes if they look good." -ForegroundColor Green
