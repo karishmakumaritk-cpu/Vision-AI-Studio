@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { openai } from '@/lib/openai';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { assertUsageWithinPlan } from '@/lib/usage';
 import { generateSchema } from '@/lib/validations';
@@ -15,12 +14,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+
   try {
     const payload = generateSchema.parse(await req.json());
     const allowed = await assertUsageWithinPlan(session.user.id, session.user.subscriptionPlan as any);
     if (!allowed) return NextResponse.json({ error: 'Usage limit reached for current plan' }, { status: 403 });
 
-    const completion = await openai.chat.completions.create({
+    const { OpenAI } = await import('openai');
+    const client = new OpenAI({ apiKey });
+    const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: `You are an expert ${payload.toolType} assistant.` },
