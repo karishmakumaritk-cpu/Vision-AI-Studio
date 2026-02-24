@@ -21,7 +21,7 @@ app.post('/api/ai/generate', async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI API key not configured' });
   try {
-    const { OpenAI } = await import('openai');
+    const OpenAI = (await import('openai')).default;
     const client = new OpenAI({ apiKey });
     // TODO: Replace with actual prompt handling and model call. Example (commented):
     // const completion = await client.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: req.body.prompt || 'Hello' }] });
