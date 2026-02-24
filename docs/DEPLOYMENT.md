@@ -66,3 +66,16 @@ Set the server-only variables in your host (Vercel/Render) as protected secrets 
 - Gmail (for owner email alerts): set `GMAIL_USER`, `GMAIL_APP_PASSWORD` in backend env.
 - Twilio WhatsApp (for +91 9818691915 alerts): set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`.
 - Endpoint used by frontend request form: `POST /api/automation/request`.
+
+
+## Cloud Agent Deployment
+
+Use the **cloud agent** (`.github/chatmodes/agent.chatmode.md`) in GitHub Copilot Chat to delegate deployment tasks. Switch to the `agent` chat mode and issue commands such as:
+
+- `Deploy the frontend to Vercel` — builds and deploys the Next.js app, verifying env vars.
+- `Deploy the backend to Railway` — triggers a Railway deployment via Dockerfile, sets env vars.
+- `Run database migrations on Supabase` — executes `database/schema.sql` and `database/seeds.sql`.
+- `Check deployment health` — verifies the live frontend and backend endpoints are responding.
+- `Rotate secrets` — guides through rotating exposed keys in Supabase, Stripe, OpenAI, and redeploying. Secrets may become exposed through accidental commits, log output, or public issue comments; if any secret is compromised, rotate it immediately in the provider dashboard before redeploying (see the "Secrets management" section above for the full list of sensitive variables).
+
+The agent follows the instructions and environment-variable rules documented in this file, so keep this document up to date as your deployment configuration evolves.
