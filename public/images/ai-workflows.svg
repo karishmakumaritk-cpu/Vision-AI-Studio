@@ -1,0 +1,13 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="800" fill="#0B1220"/>
+<circle cx="220" cy="180" r="220" fill="#4F46E5" fill-opacity="0.2"/>
+<rect x="180" y="190" width="840" height="420" rx="26" fill="#111B33" stroke="#334155"/>
+<rect x="250" y="270" width="170" height="72" rx="14" fill="#312E81"/>
+<rect x="510" y="270" width="170" height="72" rx="14" fill="#1D4ED8"/>
+<rect x="770" y="270" width="170" height="72" rx="14" fill="#0F766E"/>
+<path d="M420 306H510" stroke="#94A3B8" stroke-width="8" stroke-linecap="round"/>
+<path d="M680 306H770" stroke="#94A3B8" stroke-width="8" stroke-linecap="round"/>
+<text x="250" y="315" fill="#E2E8F0" font-family="Arial" font-size="24">Lead</text>
+<text x="540" y="315" fill="#E2E8F0" font-family="Arial" font-size="24">AI</text>
+<text x="800" y="315" fill="#E2E8F0" font-family="Arial" font-size="24">CRM</text>
+</svg>
