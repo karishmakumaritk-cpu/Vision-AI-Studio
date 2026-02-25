@@ -80,7 +80,7 @@ export default function RequestAutomation() {
             <CheckCircle style={{ width: 48, height: 48, color: '#fff' }} />
           </div>
           <h2 style={{ fontSize: 32 }}>Request Received!</h2>
-          <p style={{ color: '#94a3b8' }}>I'll review your requirements and get back to you within 24 hours with a detailed quote.</p>
+          <p style={{ color: '#94a3b8' }}>I&#39;ll review your requirements and get back to you within 24 hours with a detailed quote.</p>
 
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: 20, borderRadius: 12, marginTop: 20 }}>
             <div style={{ color: '#9ca3af', fontSize: 14 }}>Estimated Price</div>
@@ -102,7 +102,7 @@ export default function RequestAutomation() {
       <div className="container" style={{ maxWidth: 800 }}>
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <h1 style={{ fontSize: 36 }}>Request Custom Automation</h1>
-          <p style={{ color: '#94a3b8' }}>Fill out the form below. I'll review and send you a detailed quote within 24 hours.</p>
+          <p style={{ color: '#94a3b8' }}>Fill out the form below. I&#39;ll review and send you a detailed quote within 24 hours.</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'rgba(255,255,255,0.03)', padding: 20, borderRadius: 12 }}>
@@ -159,9 +159,9 @@ export default function RequestAutomation() {
                 <div>
                   <div style={{ color: '#a78bfa', fontWeight: 700 }}>What happens next?</div>
                   <ul style={{ color: '#9ca3baf', marginTop: 6 }}>
-                    <li>✓ You'll receive an email confirmation instantly</li>
-                    <li>✓ I'll review your requirements (within 24 hours)</li>
-                    <li>✓ You'll get a WhatsApp message with detailed quote</li>
+                    <li>✓ You&#39;ll receive an email confirmation instantly</li>
+                    <li>✓ I&#39;ll review your requirements (within 24 hours)</li>
+                    <li>✓ You&#39;ll get a WhatsApp message with detailed quote</li>
                     <li>✓ We discuss and finalize the scope</li>
                     <li>✓ I build your automation in n8n</li>
                     <li>✓ You track progress in your dashboard</li>
