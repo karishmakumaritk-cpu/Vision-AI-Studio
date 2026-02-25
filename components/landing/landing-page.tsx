@@ -7,24 +7,64 @@ import { SocialProofSection } from '@/components/landing/sections/social-proof';
 
 export function LandingPage() {
   return (
-    <div className="container-shell py-8 md:py-10">
-      <header className="glass-nav flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold tracking-tight">Vision AI Studio</h1>
-        <div className="space-x-3 text-sm">
-          <Link href="/signin" className="text-slate-300 hover:text-white">Login</Link>
-          <Link href="/signup" className="rounded-md bg-indigo-600 px-3 py-2 font-medium hover:bg-indigo-500">Get Started</Link>
+    <>
+      {/* Ambient orbs */}
+      <div className="orb orb1" />
+      <div className="orb orb2" />
+      <div className="orb orb3" />
+
+      {/* Fixed navigation */}
+      <nav className="site-nav">
+        <Link
+          href="/"
+          style={{
+            background: 'linear-gradient(135deg,#6c47ff,#a855f7)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            fontSize: '20px',
+            fontWeight: 800,
+            letterSpacing: '-0.5px',
+            textDecoration: 'none'
+          }}
+        >
+          Vision AI Studio
+        </Link>
+
+        <div className="nav-links hidden md:flex items-center gap-9">
+          <Link href="#features" style={{ color: 'var(--m1)', fontSize: '14px', fontWeight: 500, textDecoration: 'none', transition: 'color .2s' }}>Features</Link>
+          <Link href="#pricing"  style={{ color: 'var(--m1)', fontSize: '14px', fontWeight: 500, textDecoration: 'none', transition: 'color .2s' }}>Pricing</Link>
+          <Link href="/dashboard" style={{ color: 'var(--m1)', fontSize: '14px', fontWeight: 500, textDecoration: 'none', transition: 'color .2s' }}>Dashboard</Link>
         </div>
-      </header>
 
-      <HeroSection />
-      <GallerySection />
-      <FeaturesSection />
-      <PricingSection />
-      <SocialProofSection />
+        <div className="flex items-center gap-2.5">
+          <Link href="/signin" className="btn-ghost">Login</Link>
+          <Link href="/signup" className="btn-primary"><span>Get Started</span></Link>
+        </div>
+      </nav>
 
-      <footer className="mt-12 border-t border-slate-800 py-6 text-sm text-slate-400">
-        © {new Date().getFullYear()} Vision AI Studio · Terms · Privacy · Contact · Docs
+      <main>
+        <HeroSection />
+        <GallerySection />
+        <FeaturesSection />
+        <PricingSection />
+        <SocialProofSection />
+      </main>
+
+      <footer className="site-footer">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm" style={{ color: 'var(--m2)' }}>
+            © {new Date().getFullYear()} Vision AI Studio. All rights reserved.
+          </p>
+          <div className="flex items-center gap-6">
+            {['Terms', 'Privacy', 'Contact', 'Docs'].map((label) => (
+              <Link key={label} href="#" style={{ color: 'var(--m1)', fontSize: '13px', textDecoration: 'none', transition: 'color .2s' }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </footer>
-    </div>
+    </>
   );
 }

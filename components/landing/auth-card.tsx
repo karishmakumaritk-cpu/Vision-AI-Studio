@@ -43,15 +43,48 @@ export function AuthCard({ mode }: { mode: 'signin' | 'signup' }) {
   };
 
   return (
-    <div className="container-shell flex min-h-[80vh] items-center justify-center">
-      <form onSubmit={onSubmit} className="card w-full max-w-md space-y-4 p-6">
-        <h1 className="text-2xl font-semibold">{mode === 'signin' ? 'Sign in' : 'Create account'}</h1>
-        {mode === 'signup' && <input name="name" placeholder="Name" className="w-full rounded-md border border-slate-700 bg-slate-900 p-2" />}
-        <input name="email" placeholder="Email" type="email" className="w-full rounded-md border border-slate-700 bg-slate-900 p-2" required />
-        <input name="password" placeholder="Password" type="password" className="w-full rounded-md border border-slate-700 bg-slate-900 p-2" required />
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <button className="w-full rounded-md bg-indigo-600 p-2" disabled={loading}>{loading ? 'Please wait…' : (mode === 'signin' ? 'Sign in' : 'Sign up')}</button>
-        <button type="button" onClick={() => signIn('google', { callbackUrl: '/dashboard' })} className="w-full rounded-md border border-slate-700 p-2">Continue with Google</button>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative', zIndex: 2 }}>
+      <form onSubmit={onSubmit} className="card" style={{ width: '100%', maxWidth: '420px', padding: '36px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 800, letterSpacing: '-.5px', color: 'var(--txt)', marginBottom: '4px' }}>
+          {mode === 'signin' ? 'Sign in' : 'Create account'}
+        </h1>
+        {mode === 'signup' && (
+          <input
+            name="name"
+            placeholder="Name"
+            style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--bd2)', background: 'var(--s3)', padding: '10px 14px', color: 'var(--txt)', fontSize: '14px', outline: 'none' }}
+          />
+        )}
+        <input
+          name="email"
+          placeholder="Email"
+          type="email"
+          required
+          style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--bd2)', background: 'var(--s3)', padding: '10px 14px', color: 'var(--txt)', fontSize: '14px', outline: 'none' }}
+        />
+        <input
+          name="password"
+          placeholder="Password"
+          type="password"
+          required
+          style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--bd2)', background: 'var(--s3)', padding: '10px 14px', color: 'var(--txt)', fontSize: '14px', outline: 'none' }}
+        />
+        {error && <p style={{ fontSize: '13px', color: 'var(--err)' }}>{error}</p>}
+        <button
+          className="btn-primary"
+          disabled={loading}
+          style={{ width: '100%', padding: '12px' }}
+        >
+          <span>{loading ? 'Please wait…' : (mode === 'signin' ? 'Sign in' : 'Sign up')}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+          className="btn-ghost"
+          style={{ width: '100%', padding: '12px' }}
+        >
+          Continue with Google
+        </button>
       </form>
     </div>
   );

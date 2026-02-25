@@ -2,20 +2,45 @@ import Link from 'next/link';
 
 export function HeroSection() {
   return (
-    <section className="hero-animated relative mt-8 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70 p-8 md:p-14">
-      <div className="hero-glow" />
-      <p className="inline-flex rounded-full border border-indigo-400/40 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-300">
+    <section className="hero-section">
+      <div className="hero-eyebrow">
+        <span className="live-dot" />
         Production-ready AI SaaS Platform
+      </div>
+
+      <h1 className="hero-title">
+        Build Your AI Business
+        <br />
+        <span className="gtext">Faster Than Ever</span>
+      </h1>
+
+      <p className="hero-sub">
+        Inspired by Tixu.ai-style execution — engineered as a scalable Next.js&nbsp;+&nbsp;Prisma
+        application with real subscription and admin foundations.
       </p>
-      <h2 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight md:text-5xl">
-        Build a modern AI SaaS business with auth, billing, dashboard, and automation built in.
-      </h2>
-      <p className="mt-4 max-w-2xl text-slate-300">
-        Inspired by Tixu.ai-style execution — engineered as a scalable Next.js + Prisma application with real subscription and admin foundations.
-      </p>
-      <div className="mt-7 flex flex-wrap gap-3">
-        <Link href="/signup" className="rounded-md bg-indigo-600 px-4 py-2 font-medium hover:bg-indigo-500">Start Free Trial</Link>
-        <Link href="/dashboard" className="rounded-md border border-slate-700 px-4 py-2 text-slate-200 hover:border-slate-500">View Dashboard</Link>
+
+      <div className="hero-cta flex gap-4 justify-center flex-wrap">
+        <Link href="/signup" className="btn-primary btn-xl"><span>Start Free Trial</span></Link>
+        <Link href="/dashboard" className="btn-ghost btn-xl">View Dashboard</Link>
+      </div>
+
+      <div className="hero-stats">
+        <div className="hstat">
+          <div className="hstat-n">500+</div>
+          <div className="hstat-l">AI Prompts / Month</div>
+        </div>
+        <div className="hstat">
+          <div className="hstat-n">3</div>
+          <div className="hstat-l">Subscription Plans</div>
+        </div>
+        <div className="hstat">
+          <div className="hstat-n">99.9%</div>
+          <div className="hstat-l">Uptime SLA</div>
+        </div>
+        <div className="hstat">
+          <div className="hstat-n">24/7</div>
+          <div className="hstat-l">AI Assistance</div>
+        </div>
       </div>
     </section>
   );
