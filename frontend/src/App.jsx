@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import Header from './components/Header';
 import Navbar from './components/Navbar';
 import AIAssistant from './components/AIAssistant';
 import Landing from './pages/Landing';
@@ -13,6 +14,7 @@ import Admin from './pages/Admin';
 import Automations from './pages/Automations';
 import RequestAutomation from './pages/RequestAutomation';
 import Home from './pages/Home';
+import Merchant from './pages/Merchant';
 
 function Protected({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
@@ -25,6 +27,7 @@ function Protected({ children, adminOnly = false }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <Header />
       <Navbar />
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -34,6 +37,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/products" element={<Products />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/merchant" element={<Merchant />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
         <Route path="/admin" element={<Protected adminOnly><Admin /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -2,6 +2,48 @@
 
 Vision AI Studio is a single-monolith SaaS platform designed for fast go-to-market.
 
+## Supabase Auth + AI Endpoint (feature-auth)
+
+### What changed
+- **`frontend/src/supabaseClient.js`**: Supabase JS client helper using `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+- **`frontend/src/context/AuthContext.jsx`**: Replaced backend-JWT auth with Supabase `onAuthStateChange` / `getSession`.
+- **`frontend/src/pages/Signup.jsx`**: Calls `supabase.auth.signUp()`, shows success message and link to login.
+- **`frontend/src/pages/Login.jsx`**: Calls `supabase.auth.signInWithPassword()`, redirects to `/dashboard`.
+- **`frontend/src/pages/Dashboard.jsx`**: Checks Supabase session (redirects to `/login` if none); shows user email and an AI Generate form that POSTs to `/api/ai/generate`.
+- **`backend/src/index.js`**: Added `POST /api/ai/generate` with lazy OpenAI initialization (returns 500 if `OPENAI_API_KEY` is not set); added `POST /api/auth/register` placeholder for backwards compatibility.
+- **`frontend/package.json`**: Added `@supabase/supabase-js` dependency.
+- **`.env.example`** and **`frontend/.env.example`**: Added Supabase and API URL env var templates.
+- **`package.json`** (root): Added `dev:frontend`, `build:frontend`, `start:frontend`, and `start:backend` scripts.
+
+### Local dev test instructions
+
+1. Create a `.env` file in `frontend/` with:
+   ```
+   VITE_SUPABASE_URL=<your Supabase project URL>
+   VITE_SUPABASE_ANON_KEY=<your Supabase anon key>
+   VITE_API_URL=http://localhost:5000/api
+   ```
+2. Create a `.env` file in `backend/` with:
+   ```
+   PORT=5000
+   OPENAI_API_KEY=<your OpenAI key>   # optional — omit to test the 500 fallback
+   ```
+3. Install and start the backend:
+   ```bash
+   cd backend && npm install && npm run dev
+   ```
+4. Install and start the frontend:
+   ```bash
+   cd frontend && npm install && npm run dev
+   ```
+5. Open `http://localhost:5173` in your browser.
+6. Navigate to `/signup`, create an account and verify the success screen appears.
+7. Open your Supabase dashboard → Authentication → Users to confirm the new user exists.
+8. Navigate to `/login`, sign in with the same credentials, and confirm you are redirected to `/dashboard`.
+9. On the dashboard, enter a prompt and click **Generate**:
+   - If `OPENAI_API_KEY` is set, you should see an AI response.
+   - If not set, you should see `{ "error": "OpenAI API key not configured" }`.
+
 ## Structure
 
 - `frontend/` React + Vite app (Landing, auth, dashboard, admin)
