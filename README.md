@@ -1,260 +1,120 @@
-# Vision AI Studio - Production Monolith SaaS
+# Vision AI Studio — Production SaaS
 
-Vision AI Studio is a single-monolith SaaS platform designed for fast go-to-market.
+## 🚀 Deploy in 4 Steps
 
-## Supabase Auth + AI Endpoint (feature-auth)
+---
 
-### What changed
-- **`frontend/src/supabaseClient.js`**: Supabase JS client helper using `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-- **`frontend/src/context/AuthContext.jsx`**: Replaced backend-JWT auth with Supabase `onAuthStateChange` / `getSession`.
-- **`frontend/src/pages/Signup.jsx`**: Calls `supabase.auth.signUp()`, shows success message and link to login.
-- **`frontend/src/pages/Login.jsx`**: Calls `supabase.auth.signInWithPassword()`, redirects to `/dashboard`.
-- **`frontend/src/pages/Dashboard.jsx`**: Checks Supabase session (redirects to `/login` if none); shows user email and an AI Generate form that POSTs to `/api/ai/generate`.
-- **`backend/src/index.js`**: Added `POST /api/ai/generate` with lazy OpenAI initialization (returns 500 if `OPENAI_API_KEY` is not set); added `POST /api/auth/register` placeholder for backwards compatibility.
-- **`frontend/package.json`**: Added `@supabase/supabase-js` dependency.
-- **`.env.example`** and **`frontend/.env.example`**: Added Supabase and API URL env var templates.
-- **`package.json`** (root): Added `dev:frontend`, `build:frontend`, `start:frontend`, and `start:backend` scripts.
+### STEP 1 — Fix Google OAuth (CRITICAL)
 
-### Local dev test instructions
+Go to: https://console.cloud.google.com/apis/credentials
 
-1. Create a `.env` file in `frontend/` with:
-   ```
-   VITE_SUPABASE_URL=<your Supabase project URL>
-   VITE_SUPABASE_ANON_KEY=<your Supabase anon key>
-   VITE_API_URL=http://localhost:5000/api
-   ```
-2. Create a `.env` file in `backend/` with:
-   ```
-   PORT=5000
-   OPENAI_API_KEY=<your OpenAI key>   # optional — omit to test the 500 fallback
-   ```
-3. Install and start the backend:
-   ```bash
-   cd backend && npm install && npm run dev
-   ```
-4. Install and start the frontend:
-   ```bash
-   cd frontend && npm install && npm run dev
-   ```
-5. Open `http://localhost:5173` in your browser.
-6. Navigate to `/signup`, create an account and verify the success screen appears.
-7. Open your Supabase dashboard → Authentication → Users to confirm the new user exists.
-8. Navigate to `/login`, sign in with the same credentials, and confirm you are redirected to `/dashboard`.
-9. On the dashboard, enter a prompt and click **Generate**:
-   - If `OPENAI_API_KEY` is set, you should see an AI response.
-   - If not set, you should see `{ "error": "OpenAI API key not configured" }`.
+Click your OAuth 2.0 Client (Web client 2)
 
-## Structure
-
-- `frontend/` React + Vite app (Landing, auth, dashboard, admin)
-- `backend/` Express API (auth, products, workflows, payments, admin)
-- `database/` Supabase SQL schema and seeds
-- `docs/` architecture, API, deployment docs
-
-## Quick Start
-
-### Backend
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
+Add to **Authorized redirect URIs**:
+```
+https://vision-ai-studio-ashy.vercel.app/api/auth/callback/google
 ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
+Also add to **Authorized JavaScript origins**:
+```
+https://vision-ai-studio-ashy.vercel.app
 ```
 
-### Database
-Run SQL files in Supabase SQL editor:
-- `database/schema.sql`
-- `database/seeds.sql`
+Save. Wait 5 minutes.
 
-## Production Notes
-- JWT auth + role-based admin routes
-- Trial/subscription-aware workflow middleware
-- Stripe + Razorpay payment endpoints
-- OpenAI-backed workflow service
-- Cron hooks for trial expiration checks
+---
 
-See docs in `docs/` for API and deployment details.
+### STEP 2 — Setup Supabase
 
+1. Go to https://supabase.com → Create project
+2. Go to SQL Editor → Run the file: `supabase-schema.sql`
+3. Copy your credentials from Settings → API
 
-## Supabase URI Error Fix
-If your URI shows connection/auth errors, ensure:
-- `sslmode=require` is present
-- password is URL-encoded
-- runtime uses Supabase pooler (`port 6543`)
-- direct host (`db.<ref>.supabase.co:5432`) is used only when required for migrations.
+---
 
+### STEP 3 — Push to GitHub
 
-## Supabase Connection Quick Fix (for your error)
-Use these exact formats:
+```bash
+git init
+git add .
+git commit -m "Vision AI Studio v1.0"
+git remote add origin https://github.com/YOUR_USERNAME/vision-ai-studio.git
+git push -u origin main
+```
 
-- Prisma runtime (`DATABASE_URL`):
-  - `postgresql://postgres.pcrtgcyqryafuautfctg:[PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require`
-- Prisma migrate (`DIRECT_URL`):
-  - `postgresql://postgres:[PASSWORD]@db.pcrtgcyqryafuautfctg.supabase.co:5432/postgres?sslmode=require`
-- Supabase JS client (`SUPABASE_URL`):
-  - `https://pcrtgcyqryafuautfctg.supabase.co`
+---
 
-If password has special chars (`@`, `#`, `%`), URL-encode before placing in URI.
+### STEP 4 — Deploy on Vercel
 
-## Quick local run (static frontend + backend)
+1. Go to https://vercel.com → New Project
+2. Import your GitHub repo
+3. Add Environment Variables:
 
-- Backend (Express):
-  1. cd backend
-  2. npm install
-  3. cp .env.example .env  # fill values
-  4. npm run dev
-  Backend listens on PORT (default 5000).
+| Variable | Value |
+|----------|-------|
+| `NEXTAUTH_SECRET` | Run: `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `https://vision-ai-studio-ashy.vercel.app` |
+| `NEXT_PUBLIC_SUPABASE_URL` | From Supabase Settings → API |
+| `SUPABASE_SERVICE_KEY` | From Supabase Settings → API (service_role key) |
+| `GOOGLE_CLIENT_ID` | `318717295860-vuhr6eh7angp6k56tt99s8jbaimgb0cg.apps.googleusercontent.com` |
+| `GOOGLE_CLIENT_SECRET` | From Google Console |
 
-- Static frontend (quick preview using index.html):
-  Option A — serve with a static server:
-    npx serve -s .
-    Then open http://localhost:3000 (or port printed by serve). The static entry is index.html which mounts src/main.js -> src/App.jsx.
+4. Click **Deploy**
 
-  Option B — open index.html in browser (no dev server). Some features (fetch/XHR) require a server.
+---
 
-Notes:
-- For full Next.js frontend run the root project with `npm run dev` (Next) after installing deps.
-- Environment variables: use `.env.example` as a template. Do not commit secrets.
-  
-IMPORTANT: secrets safety
+### Make Yourself Admin
 
-- Never paste real API keys, service role keys, database passwords, or other secrets into public chat, issues, or commit messages. If any secret has been exposed, rotate it immediately in the provider dashboard (Supabase, Stripe, Twilio, OpenAI, etc.) and update the deployment environment variables.
+After first signup, run in Supabase SQL Editor:
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+```
 
+---
 
-## Quick Windows fix for "ENOENT: no such file or directory, open 'C:\Users\karis\package.json'"
+## 📁 Project Structure
 
-If you see errors like:
-- "Could not read package.json: ENOENT"
-- "Cannot find path 'C:\Users\karis\frontend'"
+```
+vision-ai-studio/
+├── app/
+│   ├── page.tsx              ← Public homepage
+│   ├── signin/page.tsx       ← Login page
+│   ├── signup/page.tsx       ← Register page
+│   ├── dashboard/            ← Customer dashboard (protected)
+│   ├── admin/                ← Admin panel (admin only)
+│   ├── pricing/page.tsx      ← Pricing page
+│   └── api/
+│       ├── auth/[...nextauth]/route.ts
+│       ├── auth/signup/route.ts
+│       └── workflows/route.ts
+├── lib/
+│   ├── auth.ts               ← NextAuth config (JWT)
+│   └── supabase.ts           ← Supabase admin client
+├── middleware.ts              ← Route protection
+├── supabase-schema.sql        ← Run this in Supabase
+├── .env.example               ← Copy to .env.local
+└── vercel.json
+```
 
-It means your terminal is not inside the project folder. Do the following in PowerShell:
+---
 
-1. Find the project folder (example locations)
-- If you cloned the repo to Documents or Projects:
-  PS> cd C:\Users\karis\Documents\Projects\Vision-AI-Studio
-- If you used GitHub Desktop or another tool, adjust path accordingly.
+## 🔧 Why OAuthSignin Error Happened
 
-2. Verify you're in the folder that contains package.json:
-  PS> Get-ChildItem -Name package.json
-  # or
-  PS> dir package.json
+The error `OAuthSignin` means Google couldn't redirect back.
 
-You should see package.json listed. If not, `cd` into the correct directory.
+**Root cause**: Missing redirect URI in Google Console.
 
-3. Install and run (examples)
+**Fix**: Add `https://vision-ai-studio-ashy.vercel.app/api/auth/callback/google` to Google Console redirect URIs (Step 1 above).
 
-- For the monorepo root (Next.js app):
-  PS> cd C:\path\to\Vision-AI-Studio
-  PS> npm install
-  PS> npm run dev
+---
 
-- For the Vite frontend (if using frontend/ folder):
-  PS> cd C:\path\to\Vision-AI-Studio\frontend
-  PS> npm install
-  PS> npm run dev
+## 🛡️ Route Protection
 
-- For the Express backend:
-  PS> cd C:\path\to\Vision-AI-Studio\backend
-  PS> npm install
-  PS> npm run dev
-
-4. Quick checks
-- Confirm current path:
-  PS> Get-Location
-- Confirm package.json exists:
-  PS> Test-Path package.json
-
-5. Common causes & fixes
-- Typo in folder name — use tab-complete when cd-ing.
-- You cloned the repo into a different parent folder — search for the project:
-  PS> Get-ChildItem -Directory -Recurse -Depth 2 | Where-Object { $_.Name -match "Vision-AI-Studio" }
-
-If you paste the output of `Get-Location` and `dir package.json` I can tell you the exact next command to run.
-
-## How to run the project (copy-paste)
-
-Important: All commands must be run from the project root — the directory that contains package.json.
-
-Windows (PowerShell)
-1) Open PowerShell and change to project folder:
-   PS> cd "C:\path\to\Vision-AI-Studio"
-
-2) Verify you're in the right folder:
-   PS> Get-Location
-   PS> Test-Path package.json
-   # should return True
-
-3) Install root dependencies and run Next (if using Next at root):
-  PS> npm install
-   PS> npm run dev
-   # Next dev runs at http://localhost:3000 by default
-
-If you see "Could not read package.json: ENOENT" then you are in the wrong folder — cd into the folder that contains package.json.
-
-Frontend (Vite) — if you are running the separate frontend/ app:
-   PS> cd "C:\path\to\Vision-AI-Studio\frontend"
-   PS> npm install
-   PS> npm run dev
-   # Vite dev server typically: http://localhost:5173
-
-Backend (Express) — if you are running backend/ separately:
-   PS> cd "C:\path\to\Vision-AI-Studio\backend"
-   PS> npm install
-   PS> npm run dev
-   # Backend default: http://localhost:5000
-
-macOS / Linux (bash)
-1) cd to project root:
-   $ cd /full/path/to/Vision-AI-Studio
-2) Verify folder:
-   $ pwd
-   $ ls package.json
-3) Install & run root Next app:
-  $ npm install
-   $ npm run dev
-
-Docker (if you prefer containerized)
-From project root:
-   $ docker compose up --build
-This will build and start the web service (port mapping from docker-compose.yml).
-
-Quick fixes for common errors
-- ENOENT / Could not read package.json:
-  -> You ran npm where package.json does not exist. Run `Get-Location` (PowerShell) or `pwd` (bash) and `ls package.json` to confirm.
-- "Cannot find path '.../frontend'":
-  -> Ensure the frontend folder exists. If you intended to run the root Next app, use the root commands above.
-- Port in use:
-  -> Find process and stop it, or run with a different port: e.g., `PORT=3001 npm run dev` (bash) or `$env:PORT=3001; npm run dev` (PowerShell).
-- Missing env values:
-  -> Copy `.env.example` to `.env` and fill secrets before starting services that require them.
-
-If you want, I can:
-- Add a convenience script in package.json to run frontend + backend concurrently (requires adding `concurrently` as a devDependency).
-- Walk you through exact steps to run on your machine if you paste the output of:
-  - Windows: Get-Location and dir package.json
-  - macOS/Linux: pwd and ls package.json
-
-## Auto-locate project on Windows (quick)
-
-If you can't `cd` into the project because you're not sure where it was cloned, run the included helper:
-
-PowerShell (copy-paste):
-  cd "<path-to-this-repo>"
-  powershell -ExecutionPolicy Bypass -File .\tools\find-project.ps1
-
-The script will:
-- search common locations (Documents, Desktop, Downloads, OneDrive, Projects),
-- print the found path,
-- copy the path to the clipboard,
-- optionally open a new PowerShell window at the project root.
-
-When the script prints the project path, run:
-  cd "C:\full\path\to\Vision-AI-Studio"
-Then run the appropriate install/start commands described earlier (e.g., `npm install` and `npm run dev` at project root).
+| Route | Access |
+|-------|--------|
+| `/` | Public |
+| `/signin` | Public |
+| `/signup` | Public |
+| `/pricing` | Public |
+| `/dashboard` | Logged in users |
+| `/admin` | Admin role only |
