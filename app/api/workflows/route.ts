@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
 
   const { error } = await supabaseAdmin
     .from('workflows')
-    .update({ status })
+    .update({ status, updated_at: new Date().toISOString() })
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
