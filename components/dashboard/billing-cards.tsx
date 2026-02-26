@@ -1,9 +1,9 @@
 'use client';
 
 const plans = [
-  ['FREE', 'Basic usage, capped daily'],
-  ['PRO', 'For solo founders and creators'],
-  ['PREMIUM', 'Unlimited + priority processing']
+  { name: 'FREE', desc: 'Basic usage, capped daily', icon: '🌱', color: 'from-slate-700/30 to-slate-800/20' },
+  { name: 'PRO', desc: 'For solo founders and creators', icon: '⚡', color: 'from-indigo-600/20 to-violet-600/10' },
+  { name: 'PREMIUM', desc: 'Unlimited + priority processing', icon: '💎', color: 'from-amber-600/15 to-orange-600/10' },
 ] as const;
 
 export function BillingCards() {
@@ -18,14 +18,28 @@ export function BillingCards() {
   };
 
   return (
-    <div>
-      <h1 className="mb-4 text-2xl font-semibold">Billing</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-white">Billing</h1>
+        <p className="mt-1 text-sm text-slate-500">Manage your subscription plan.</p>
+      </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {plans.map(([plan, desc]) => (
-          <div key={plan} className="card p-4">
-            <h2 className="text-lg font-medium">{plan}</h2>
-            <p className="mt-2 text-sm text-slate-400">{desc}</p>
-            {plan !== 'FREE' && <button onClick={() => createCheckout(plan)} className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm">Upgrade</button>}
+        {plans.map(({ name, desc, icon, color }) => (
+          <div key={name} className={`card bg-gradient-to-br p-5 ${color}`}>
+            <div className="mb-3 text-2xl">{icon}</div>
+            <h2 className="text-base font-bold text-white">{name}</h2>
+            <p className="mt-1.5 text-sm text-slate-400">{desc}</p>
+            {name !== 'FREE' && (
+              <button
+                onClick={() => createCheckout(name)}
+                className="btn-primary mt-4 justify-center py-2.5 text-xs"
+              >
+                Upgrade to {name}
+              </button>
+            )}
+            {name === 'FREE' && (
+              <span className="mt-4 inline-block rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-500">Current base plan</span>
+            )}
           </div>
         ))}
       </div>

@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
         if (!user?.password) return null;
         const ok = await bcrypt.compare(credentials.password, user.password);
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.name, role: user.role, subscriptionPlan: user.subscriptionPlan };
+        return { id: user.id, email: user.email, name: user.name, role: user.role, subscription_status: user.subscriptionPlan, trial_end: null };
       }
     })
   ],
@@ -34,7 +34,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = (user as any).id;
         token.role = (user as any).role;
-        token.subscriptionPlan = (user as any).subscriptionPlan;
+        token.subscription_status = (user as any).subscription_status;
+        token.trial_end = (user as any).trial_end ?? null;
       }
       return token;
     },
@@ -42,7 +43,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        session.user.subscriptionPlan = token.subscriptionPlan as string;
+        session.user.subscription_status = token.subscription_status as string;
+        session.user.trial_end = (token.trial_end as string | null) ?? null;
       }
       return session;
     }
