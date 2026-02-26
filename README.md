@@ -50,16 +50,21 @@ git push -u origin main
 
 1. Go to https://vercel.com → New Project
 2. Import your GitHub repo
-3. Add Environment Variables:
+3. Add Environment Variables (**set for All Environments**):
 
-| Variable | Value |
-|----------|-------|
-| `NEXTAUTH_SECRET` | Run: `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | Your production URL, e.g. `https://vision-ai-studio-git-main-velisions-projects.vercel.app` (use `http://localhost:3000` for local dev) |
-| `NEXT_PUBLIC_SUPABASE_URL` | From Supabase Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase Settings → API (service_role key) |
-| `GOOGLE_CLIENT_ID` | `318717295860-vuhr6eh7angp6k56tt99s8jbaimgb0cg.apps.googleusercontent.com` |
-| `GOOGLE_CLIENT_SECRET` | From Google Console |
+| Variable | Correct value / where to find it |
+|----------|----------------------------------|
+| `NEXTAUTH_URL` | Your stable production URL, e.g. `https://vision-ai-studio-git-main-velisions-projects.vercel.app` |
+| `NEXT_PUBLIC_APP_URL` | Same as `NEXTAUTH_URL` above |
+| `NEXTAUTH_SECRET` | Run `openssl rand -base64 32` and paste the output. **Do NOT use your Vercel project ID** — it must be a long random secret. |
+| `GOOGLE_CLIENT_ID` | From Google Cloud Console → Credentials |
+| `GOOGLE_CLIENT_SECRET` | From Google Cloud Console → Credentials |
+| `NEXT_PUBLIC_SUPABASE_URL` | The Supabase project **REST URL**: `https://<project-ref>.supabase.co` — found in Supabase → Settings → API. **This is NOT the same as the PostgreSQL connection string.** |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | From Supabase → Settings → API → anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase → Settings → API → service_role key |
+| `DATABASE_URL` | Supabase pooler URL with your **real password** substituted for `<YOUR-PASSWORD>`: `postgresql://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require` |
+| `DIRECT_URL` | Supabase direct URL (for Prisma migrations): `postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres?sslmode=require` |
+| `OPENAI_API_KEY` | From https://platform.openai.com/api-keys |
 
 4. Click **Deploy**
 
@@ -100,14 +105,52 @@ vision-ai-studio/
 
 ---
 
-## 🔧 Why OAuthSignin / redirect_uri_mismatch Error Happened
+## 🔧 Troubleshooting Common Errors
 
-The error `OAuthSignin` or `Error 400: redirect_uri_mismatch` means Google couldn't redirect back because the `redirect_uri` the app sent doesn't match any URI registered in Google Console.
+### Error 400: redirect_uri_mismatch (Google OAuth)
 
-**Two common root causes:**
+The `redirect_uri` the app sent to Google doesn't match any URI registered in Google Console.
 
-1. **Wrong or missing redirect URI in Google Console** — ensure the URI from Step 1 is registered exactly.
-2. **Vercel preview deployment URL** — Vercel generates a unique URL for every commit preview (e.g. `vision-ai-studio-80hlc8w72-velisions-projects.vercel.app`). If `NEXTAUTH_URL` is not set, NextAuth falls back to this dynamic URL which is never registered in Google Console. Fix: `next.config.mjs` now automatically pins `NEXTAUTH_URL` to `NEXT_PUBLIC_APP_URL` when `NEXTAUTH_URL` is absent. **You must set both `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to the canonical production URL in Vercel environment variables.**
+**Root cause 1 — Wrong URI in Google Console.**
+Register this URI exactly in Google Console (Step 1 above):
+```
+https://vision-ai-studio-git-main-velisions-projects.vercel.app/api/auth/callback/google
+```
+
+**Root cause 2 — Vercel preview deployment URL.**
+Vercel assigns a unique URL to every preview build (e.g. `vision-ai-studio-80hlc8w72-velisions-projects.vercel.app`). These change every deploy and cannot all be registered. `next.config.mjs` now pins `NEXTAUTH_URL` to `NEXT_PUBLIC_APP_URL` whenever `NEXTAUTH_URL` is not explicitly set. **You must still set `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` in Vercel to the stable production URL for all environments.**
+
+---
+
+### Signup / Login fails silently or with a database error
+
+**Cause: `DATABASE_URL` still has the placeholder password.**
+If your `DATABASE_URL` contains the literal text `[YOUR-PASSWORD]` or `<YOUR-PASSWORD>`, Prisma cannot connect to Supabase. Replace it with your real database password from Supabase → Settings → Database → Connection string.
+
+**Cause: `DIRECT_URL` is not set.**
+Prisma's schema requires both `DATABASE_URL` (pooler, for runtime) and `DIRECT_URL` (direct, for migrations). Add `DIRECT_URL` to your Vercel env vars.
+
+---
+
+### Supabase client errors / NEXT_PUBLIC_SUPABASE_URL misconfigured
+
+`NEXT_PUBLIC_SUPABASE_URL` must be the Supabase project **REST URL** — an HTTPS address like:
+```
+https://<project-ref>.supabase.co
+```
+Your Supabase project ref is the string between `//` and `.supabase.co` in your DATABASE_URL.
+
+**Do NOT** set it to a PostgreSQL connection string (`postgresql://...`). That belongs in `DATABASE_URL` only. The app will throw a startup error if a non-HTTPS URL is detected here.
+
+---
+
+### NextAuth JWT / session errors
+
+`NEXTAUTH_SECRET` must be a long, random string. Generate one with:
+```bash
+openssl rand -base64 32
+```
+**Do NOT** reuse your Vercel project ID or any other existing key as the secret.
 
 ---
 
