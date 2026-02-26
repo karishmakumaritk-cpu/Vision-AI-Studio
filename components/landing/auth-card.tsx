@@ -60,17 +60,17 @@ export function AuthCard({ mode }: { mode: 'signin' | 'signup' }) {
         <form onSubmit={onSubmit} className="card space-y-4 p-7">
           {mode === 'signup' && (
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-400">Full Name</label>
-              <input name="name" placeholder="Your name" className="field" />
+              <label htmlFor="full-name" className="mb-1.5 block text-xs font-medium text-slate-400">Full Name</label>
+              <input id="full-name" name="name" placeholder="Your name" className="field" />
             </div>
           )}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Email Address</label>
-            <input name="email" placeholder="you@example.com" type="email" className="field" required />
+            <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-slate-400">Email Address</label>
+            <input id="email" name="email" placeholder="you@example.com" type="email" className="field" required />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Password</label>
-            <input name="password" placeholder="••••••••" type="password" className="field" required />
+            <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-slate-400">Password</label>
+            <input id="password" name="password" placeholder="••••••••" type="password" className="field" required />
           </div>
 
           {error && (

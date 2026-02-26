@@ -33,28 +33,30 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.03) inset;
 }
 
-/* Professional button styles */
-.btn-primary {
-  @apply inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:from-indigo-500 hover:to-violet-500 hover:shadow-indigo-500/40 active:scale-95;
-}
+@layer components {
+  /* Professional button styles */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:from-indigo-500 hover:to-violet-500 hover:shadow-indigo-500/40 active:scale-95;
+  }
 
-.btn-outline {
-  @apply inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/50 px-5 py-2.5 text-sm font-semibold text-slate-200 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-white active:scale-95;
-}
+  .btn-outline {
+    @apply inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/50 px-5 py-2.5 text-sm font-semibold text-slate-200 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-white active:scale-95;
+  }
 
-/* Professional form field */
-.field {
-  @apply w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20;
-}
+  /* Professional form field */
+  .field {
+    @apply w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20;
+  }
 
-/* Section label badge */
-.section-label {
-  @apply inline-block rounded-full border border-indigo-400/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-400;
-}
+  /* Section label badge */
+  .section-label {
+    @apply inline-block rounded-full border border-indigo-400/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-400;
+  }
 
-/* Stat pill */
-.stat-pill {
-  @apply inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-800/70 px-3.5 py-1.5 text-xs font-medium text-slate-300;
+  /* Stat pill */
+  .stat-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-800/70 px-3.5 py-1.5 text-xs font-medium text-slate-300;
+  }
 }
 
 .hero-animated {

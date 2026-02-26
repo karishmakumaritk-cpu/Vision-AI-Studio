@@ -9,7 +9,7 @@ export function LandingPage() {
   return (
     <div className="container-shell py-8 md:py-10">
       {/* Sticky professional navbar */}
-      <header className="glass-nav flex items-center justify-between gap-4">
+      <header className="glass-nav sticky top-0 z-50 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-bold shadow-lg shadow-indigo-500/30">V</span>
           <h1 className="text-base font-bold tracking-tight">Vision AI Studio</h1>
