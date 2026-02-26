@@ -1,14 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export function AuthCard({ mode }: { mode: 'signin' | 'signup' }) {
   const router = useRouter();
+  const { status } = useSession();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Redirect already-authenticated users (handles Google OAuth callback and page revisits)
+  useEffect(() => {
+    if (status === 'authenticated') router.replace('/dashboard');
+  }, [status, router]);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +45,7 @@ export function AuthCard({ mode }: { mode: 'signin' | 'signup' }) {
     });
 
     if (result?.error) setError(result.error);
-    else router.push('/dashboard');
+    else router.replace('/dashboard');
     setLoading(false);
   };
 

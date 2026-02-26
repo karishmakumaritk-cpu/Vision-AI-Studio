@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { HeroSection } from '@/components/landing/sections/hero';
 import { GallerySection } from '@/components/landing/sections/gallery';
@@ -6,8 +9,17 @@ import { PricingSection } from '@/components/landing/sections/pricing';
 import { SocialProofSection } from '@/components/landing/sections/social-proof';
 
 export function LandingPage() {
+  const [chatOpen, setChatOpen] = useState(false);
+
   return (
     <div className="container-shell py-8 md:py-10">
+      {/* Animated floating background orbs */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 left-1/4 h-96 w-96 animate-pulse rounded-full bg-indigo-600/10 blur-3xl" style={{ animationDuration: '6s' }} />
+        <div className="absolute top-1/3 right-1/4 h-72 w-72 animate-pulse rounded-full bg-violet-600/10 blur-3xl" style={{ animationDuration: '8s', animationDelay: '2s' }} />
+        <div className="absolute bottom-1/4 left-1/3 h-64 w-64 animate-pulse rounded-full bg-cyan-600/8 blur-3xl" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+      </div>
+
       {/* Sticky professional navbar */}
       <header className="glass-nav sticky top-0 z-50 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
@@ -54,6 +66,53 @@ export function LandingPage() {
           <span className="text-slate-600 text-xs">Made with AI + Passion in India 🇮🇳</span>
         </div>
       </footer>
+
+      {/* AI Chatbot bubble */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {chatOpen && (
+          <div className="card w-72 overflow-hidden shadow-2xl shadow-black/50">
+            <div className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-sm">🤖</span>
+                <span className="text-sm font-semibold text-white">Vision AI Assistant</span>
+              </div>
+              <button
+                onClick={() => setChatOpen(false)}
+                className="text-white/70 hover:text-white transition-colors"
+                aria-label="Close chat"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 space-y-3 bg-slate-900">
+              <div className="rounded-xl rounded-tl-none bg-slate-800 px-3 py-2.5 text-sm text-slate-200 max-w-[85%]">
+                👋 Hi! I&apos;m your Vision AI assistant. Ready to automate your business?
+              </div>
+              <div className="rounded-xl rounded-tl-none bg-slate-800 px-3 py-2.5 text-sm text-slate-200 max-w-[85%]">
+                We build custom AI workflows in 24 hours. What can I help you with?
+              </div>
+            </div>
+            <div className="border-t border-slate-800 p-3 bg-slate-900">
+              <Link
+                href="https://wa.me/919818691915"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-primary w-full justify-center py-2 text-xs"
+                onClick={() => setChatOpen(false)}
+              >
+                💬 Chat on WhatsApp
+              </Link>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => setChatOpen((v) => !v)}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-2xl shadow-xl shadow-indigo-500/40 transition-transform hover:scale-110 active:scale-95"
+          aria-label="Open AI chat assistant"
+        >
+          {chatOpen ? '✕' : '🤖'}
+        </button>
+      </div>
     </div>
   );
 }
