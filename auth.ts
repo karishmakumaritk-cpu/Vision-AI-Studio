@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
-import { supabaseAdmin } from './supabase'
+import { supabaseAdmin } from './lib/supabase'
 
 export const authOptions: NextAuthOptions = {
   // ✅ FIX: Must use JWT strategy (no DB adapter needed)
