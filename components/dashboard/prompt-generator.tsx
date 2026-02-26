@@ -29,8 +29,9 @@ export function PromptGenerator() {
 
       <div className="card space-y-4 p-6">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-400">Tool Type</label>
+          <label htmlFor="tool-type" className="mb-1.5 block text-xs font-medium text-slate-400">Tool Type</label>
           <select
+            id="tool-type"
             className="field"
             value={toolType}
             onChange={(e) => setToolType(e.target.value)}
@@ -42,8 +43,9 @@ export function PromptGenerator() {
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-400">Your Prompt</label>
+          <label htmlFor="prompt-input" className="mb-1.5 block text-xs font-medium text-slate-400">Your Prompt</label>
           <textarea
+            id="prompt-input"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="field h-36 resize-none"
