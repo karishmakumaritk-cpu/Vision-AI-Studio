@@ -22,6 +22,8 @@ https://vision-ai-studio-git-main-velisions-projects.vercel.app
 
 Save. Wait 5 minutes.
 
+> ⚠️ **Vercel preview deployments** get a unique URL per commit (e.g. `vision-ai-studio-80hlc8w72-velisions-projects.vercel.app`). These change every deploy and cannot all be registered. The `next.config.mjs` in this repo automatically pins `NEXTAUTH_URL` to `NEXT_PUBLIC_APP_URL` for any deployment where `NEXTAUTH_URL` is not explicitly set, ensuring Google always receives the stable registered redirect URI. You still **must** set `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` in your Vercel project environment variables (see Step 4).
+
 ---
 
 ### STEP 2 — Setup Supabase
@@ -98,13 +100,14 @@ vision-ai-studio/
 
 ---
 
-## 🔧 Why OAuthSignin Error Happened
+## 🔧 Why OAuthSignin / redirect_uri_mismatch Error Happened
 
-The error `OAuthSignin` means Google couldn't redirect back.
+The error `OAuthSignin` or `Error 400: redirect_uri_mismatch` means Google couldn't redirect back because the `redirect_uri` the app sent doesn't match any URI registered in Google Console.
 
-**Root cause**: Missing redirect URI in Google Console.
+**Two common root causes:**
 
-**Fix**: Add `https://vision-ai-studio-git-main-velisions-projects.vercel.app/api/auth/callback/google` to Google Console redirect URIs (Step 1 above).
+1. **Wrong or missing redirect URI in Google Console** — ensure the URI from Step 1 is registered exactly.
+2. **Vercel preview deployment URL** — Vercel generates a unique URL for every commit preview (e.g. `vision-ai-studio-80hlc8w72-velisions-projects.vercel.app`). If `NEXTAUTH_URL` is not set, NextAuth falls back to this dynamic URL which is never registered in Google Console. Fix: `next.config.mjs` now automatically pins `NEXTAUTH_URL` to `NEXT_PUBLIC_APP_URL` when `NEXTAUTH_URL` is absent. **You must set both `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to the canonical production URL in Vercel environment variables.**
 
 ---
 
