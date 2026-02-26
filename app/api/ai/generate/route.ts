@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   try {
     const payload = generateSchema.parse(await req.json());
-    const allowed = await assertUsageWithinPlan(session.user.id, session.user.subscriptionPlan as any);
+    const allowed = await assertUsageWithinPlan(session.user.id, session.user.subscription_status as any);
     if (!allowed) return NextResponse.json({ error: 'Usage limit reached for current plan' }, { status: 403 });
 
     const { default: OpenAI } = await import('openai');

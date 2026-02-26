@@ -5,7 +5,8 @@ declare module 'next-auth' {
     user: DefaultSession['user'] & {
       id: string;
       role: string;
-      subscriptionPlan: string;
+      subscription_status: string;
+      trial_end: string | null;
     };
   }
 }
@@ -14,6 +15,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
     role: string;
-    subscriptionPlan: string;
+    subscription_status: string;
+    trial_end: string | null;
   }
 }
