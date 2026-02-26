@@ -1,4 +1,37 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+
+function useCountUp(target: number, duration = 1800) {
+  const [count, setCount] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const step = (timestamp: number) => {
+      if (!startRef.current) startRef.current = timestamp;
+      const progress = Math.min((timestamp - startRef.current) / duration, 1);
+      setCount(Math.floor(progress * target));
+      if (progress < 1) rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+
+  return count;
+}
+
+function StatPill({ value, label }: { value: string; label: string }) {
+  const numericTarget = parseInt(value.replace(/\D/g, ''), 10);
+  const suffix = value.replace(/[\d]/g, '');
+  const animated = useCountUp(numericTarget);
+  return (
+    <span className="stat-pill">
+      <strong className="text-white font-semibold">{animated}{suffix}</strong> {label}
+    </span>
+  );
+}
 
 export function HeroSection() {
   return (
@@ -26,10 +59,10 @@ export function HeroSection() {
         </Link>
       </div>
       <div className="mt-10 flex flex-wrap gap-3">
-        <span className="stat-pill"><strong className="text-white font-semibold">120+</strong> Workflows Built</span>
-        <span className="stat-pill"><strong className="text-white font-semibold">85+</strong> Happy Clients</span>
-        <span className="stat-pill"><strong className="text-white font-semibold">24h</strong> Delivery</span>
-        <span className="stat-pill"><strong className="text-white font-semibold">99%</strong> Satisfaction</span>
+        <StatPill value="120+" label="Workflows Built" />
+        <StatPill value="85+" label="Happy Clients" />
+        <StatPill value="24h" label="Delivery" />
+        <StatPill value="99%" label="Satisfaction" />
       </div>
     </section>
   );
