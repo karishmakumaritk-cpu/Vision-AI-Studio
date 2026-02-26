@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 
 const workflows = [
   { icon: '🎯', name: 'Lead Automation', desc: 'WhatsApp + CRM auto-sync leads', price: '₹999', color: 'from-violet-500/20 to-purple-500/5', border: 'border-violet-500/25' },
@@ -30,7 +32,10 @@ function getAIReply(msg: string): string {
   return AI_GREETING
 }
 
+type PayModal = { service: string; amount: number } | null
+
 export default function HomePage() {
+  const { data: session } = useSession()
   const [chatOpen, setChatOpen] = useState(false)
   const [msgs, setMsgs] = useState([{ from: 'ai', text: AI_GREETING }])
   const [input, setInput] = useState('')
@@ -38,6 +43,10 @@ export default function HomePage() {
   const [c2, setC2] = useState(0)
   const [visible, setVisible] = useState(false)
   const [typing, setTyping] = useState(false)
+  const [payModal, setPayModal] = useState<PayModal>(null)
+  const [payTab, setPayTab] = useState<'qr' | 'apps' | 'id'>('qr')
+  const [paySuccess, setPaySuccess] = useState(false)
+  const [upiCopied, setUpiCopied] = useState(false)
   const msgsEnd = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -64,6 +73,23 @@ export default function HomePage() {
     }, 900)
   }
 
+  function openPayModal(service: string, amount: number) {
+    setPayModal({ service, amount })
+    setPayTab('qr')
+    setPaySuccess(false)
+  }
+
+  function closePayModal() {
+    setPayModal(null)
+    setPaySuccess(false)
+  }
+
+  function copyUpiId() {
+    navigator.clipboard.writeText('paytmqr5trrzi@ptys').catch(() => {})
+    setUpiCopied(true)
+    setTimeout(() => setUpiCopied(false), 2000)
+  }
+
   return (
     <div className="min-h-screen bg-[#030309] text-white overflow-x-hidden">
 
@@ -85,11 +111,7 @@ export default function HomePage() {
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 bg-[#030309]/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-            <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
+          <Image src="/logo.png" alt="Vision AI Studio" width={36} height={36} className="rounded-xl" priority />
           <span className="font-bold text-white text-base">Vision AI Studio</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
@@ -98,7 +120,11 @@ export default function HomePage() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/signin" className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors hidden sm:block">Sign In</Link>
+          {session ? (
+            <Link href="/dashboard" className="px-4 py-2 text-violet-400 hover:text-violet-300 text-sm font-semibold transition-colors hidden sm:block">Dashboard →</Link>
+          ) : (
+            <Link href="/signin" className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors hidden sm:block">Sign In</Link>
+          )}
           <Link href="/signup" className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-violet-500/25">
             Get Started
           </Link>
@@ -164,9 +190,9 @@ export default function HomePage() {
                 <p className="text-gray-400 text-sm mb-5 leading-relaxed">{wf.desc}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-emerald-400 font-black text-base">From {wf.price}</span>
-                  <Link href="/signup" className="px-4 py-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-all group-hover:translate-x-1 transition-transform">
+                  <button onClick={() => openPayModal(wf.name, parseInt(wf.price.replace(/[₹,]/g, '')))} className="px-4 py-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-all group-hover:translate-x-1">
                     Request →
-                  </Link>
+                  </button>
                 </div>
               </div>
             ))}
@@ -186,7 +212,7 @@ export default function HomePage() {
               { n: '03', t: 'Build', d: '24h timer starts' },
               { n: '04', t: 'Review', d: 'Approve demo' },
               { n: '05', t: 'Go Live', d: 'Pay & activate' },
-            ].map((s, i) => (
+            ].map((s) => (
               <div key={s.n} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 hover:border-violet-500/30 transition-all">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center font-black text-sm mx-auto mb-3 shadow-lg shadow-violet-500/25">{s.n}</div>
                 <div className="font-bold text-sm mb-1">{s.t}</div>
@@ -207,9 +233,9 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { name: 'Starter', price: '₹999', per: '/project', desc: 'Single automation', features: ['1 Workflow','24h Delivery','7-day Support','1 Revision'], featured: false },
-              { name: 'Pro', price: '₹3,999', per: '/month', desc: 'Growing businesses', features: ['3 Workflows/month','Priority Support','Unlimited Revisions','AI Voice Credits','Dashboard Access'], featured: true },
-              { name: 'Enterprise', price: 'Custom', per: '', desc: 'Agencies & exporters', features: ['Unlimited Workflows','White-label Option','Dedicated Worker','Custom Integrations','SLA Guarantee'], featured: false },
+              { name: 'Starter', price: '₹999', per: '/project', desc: 'Single automation', features: ['1 Workflow','24h Delivery','7-day Support','1 Revision'], featured: false, amount: 999 },
+              { name: 'Pro', price: '₹3,999', per: '/month', desc: 'Growing businesses', features: ['3 Workflows/month','Priority Support','Unlimited Revisions','AI Voice Credits','Dashboard Access'], featured: true, amount: 3999 },
+              { name: 'Enterprise', price: 'Custom', per: '', desc: 'Agencies & exporters', features: ['Unlimited Workflows','White-label Option','Dedicated Worker','Custom Integrations','SLA Guarantee'], featured: false, amount: 0 },
             ].map(plan => (
               <div key={plan.name} className={`rounded-2xl p-8 relative ${plan.featured ? 'bg-gradient-to-b from-violet-600/20 to-purple-500/10 border border-violet-500/40 shadow-2xl shadow-violet-500/10' : 'bg-white/[0.04] border border-white/[0.08]'}`}>
                 {plan.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-gradient-to-r from-violet-600 to-purple-500 text-white text-xs font-bold shadow-lg shadow-violet-500/30">Most Popular ⚡</div>}
@@ -219,9 +245,13 @@ export default function HomePage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map(f => <li key={f} className="flex items-center gap-2.5 text-sm text-gray-300"><span className="text-emerald-400 font-bold flex-shrink-0">✓</span>{f}</li>)}
                 </ul>
-                <Link href="/signup" className={`block text-center py-3 rounded-xl font-bold text-sm transition-all ${plan.featured ? 'bg-gradient-to-r from-violet-600 to-purple-500 text-white hover:opacity-90 shadow-lg shadow-violet-500/25' : 'border border-white/10 text-white hover:bg-white/5'}`}>
-                  {plan.name === 'Enterprise' ? 'Contact Us →' : 'Get Started →'}
-                </Link>
+                {plan.name === 'Enterprise' ? (
+                  <Link href="/signup" className="block text-center py-3 rounded-xl font-bold text-sm border border-white/10 text-white hover:bg-white/5 transition-all">Contact Us →</Link>
+                ) : (
+                  <button onClick={() => openPayModal(plan.name + ' Plan', plan.amount)} className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${plan.featured ? 'bg-gradient-to-r from-violet-600 to-purple-500 text-white hover:opacity-90 shadow-lg shadow-violet-500/25' : 'border border-white/10 text-white hover:bg-white/5'}`}>
+                    Get Started →
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -243,9 +273,7 @@ export default function HomePage() {
       <footer className="relative z-10 border-t border-white/[0.06] py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </div>
+            <Image src="/logo.png" alt="Vision AI Studio" width={32} height={32} className="rounded-lg" />
             <span className="text-gray-400 text-sm">© 2026 Vision AI Studio · Built by Karishma Kumari 🇮🇳</span>
           </div>
           <a href="https://wa.me/919818691915" target="_blank" rel="noreferrer" className="text-emerald-400 text-sm hover:text-emerald-300 transition-colors font-medium flex items-center gap-2">
@@ -266,7 +294,7 @@ export default function HomePage() {
 
       {/* CHATBOX */}
       {chatOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-[#0d0d1a] border border-violet-500/30 rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/20" style={{animation:'chatSlide 0.3s ease'}}>
+        <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-[#0d0d1a] border border-violet-500/30 rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/20 chat-slide">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-600/20 to-purple-500/10 border-b border-white/[0.08]">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-lg flex-shrink-0">🤖</div>
@@ -329,12 +357,118 @@ export default function HomePage() {
         </div>
       )}
 
-      <style jsx global>{`
-        @keyframes chatSlide {
-          from { opacity:0; transform:translateY(16px) scale(0.96); }
-          to { opacity:1; transform:translateY(0) scale(1); }
-        }
-      `}</style>
+      {/* PAYMENT MODAL */}
+      {payModal && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={e => { if (e.target === e.currentTarget) closePayModal() }}>
+          <div className="bg-[#0d0d1a] border border-purple-500/30 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-purple-500/20 chat-slide">
+            {!paySuccess ? (
+              <>
+                {/* Header */}
+                <div className="flex items-start justify-between p-6 pb-4 border-b border-white/[0.08]">
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight">Complete Payment</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">Secure checkout — Vision AI Studio</p>
+                  </div>
+                  <button onClick={closePayModal} className="text-gray-400 hover:text-white text-2xl w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all leading-none">×</button>
+                </div>
+
+                <div className="p-6 space-y-5">
+                  {/* Order summary */}
+                  <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2.5">
+                    <div className="flex justify-between text-sm"><span className="text-gray-400">Service</span><strong className="text-white">{payModal.service}</strong></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-400">Delivery</span><strong className="text-emerald-400">Within 24 hours</strong></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-400">Support</span><strong className="text-white">30-day included</strong></div>
+                    <div className="flex justify-between text-sm pt-2.5 border-t border-white/[0.08]"><span className="font-bold">Total</span><strong className="text-violet-400 text-base">₹{payModal.amount.toLocaleString('en-IN')}</strong></div>
+                  </div>
+
+                  {/* Payment tabs */}
+                  <div className="flex gap-2">
+                    {(['qr','apps','id'] as const).map(tab => (
+                      <button key={tab} onClick={() => setPayTab(tab)} className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition-all ${payTab === tab ? 'border-violet-500/40 bg-violet-500/15 text-purple-300' : 'border-white/[0.08] text-gray-400 hover:text-white'}`}>
+                        {tab === 'qr' ? 'Scan & Pay' : tab === 'apps' ? 'UPI Apps' : 'UPI ID'}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* QR tab */}
+                  {payTab === 'qr' && (
+                    <div className="text-center space-y-3">
+                      <div className="inline-block p-3 bg-white rounded-2xl">
+                        <Image src="/qr.png" alt="UPI QR Code" width={200} height={200} className="rounded-xl" />
+                      </div>
+                      <div className="text-sm font-semibold text-white">Karishma Kumari</div>
+                      <div className="text-xs text-gray-400">9818691915</div>
+                      <button onClick={() => setPaySuccess(true)} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold text-sm hover:opacity-90 transition-all">
+                        I Have Completed Payment ✓
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Apps tab */}
+                  {payTab === 'apps' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-4 gap-3">
+                        {[
+                          { name: 'Paytm', bg: 'linear-gradient(135deg,#002970,#00baf2)', letter: 'P' },
+                          { name: 'PhonePe', bg: 'linear-gradient(135deg,#5f259f,#5f259f)', letter: 'Pe' },
+                          { name: 'GPay', bg: 'linear-gradient(135deg,#4285f4,#34a853)', letter: 'G' },
+                          { name: 'BHIM', bg: 'linear-gradient(135deg,#f26522,#f26522)', letter: 'B' },
+                        ].map(app => (
+                          <div key={app.name} className="flex flex-col items-center gap-1.5 cursor-pointer group">
+                            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg group-hover:scale-105 transition-transform" style={{background: app.bg}}>{app.letter}</div>
+                            <span className="text-xs text-gray-400">{app.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <button onClick={() => setPaySuccess(true)} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold text-sm hover:opacity-90 transition-all">
+                        I Have Completed Payment ✓
+                      </button>
+                    </div>
+                  )}
+
+                  {/* UPI ID tab */}
+                  {payTab === 'id' && (
+                    <div className="space-y-3">
+                      <button onClick={copyUpiId} className="w-full flex items-center justify-between px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl hover:bg-white/[0.08] transition-all">
+                        <span className="text-sm font-mono text-violet-300">paytmqr5trrzi@ptys</span>
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${upiCopied ? 'bg-emerald-500/20 text-emerald-400' : 'bg-violet-500/20 text-violet-400'}`}>{upiCopied ? 'Copied!' : 'Copy'}</span>
+                      </button>
+                      <p className="text-center text-sm text-gray-400">Pay <strong className="text-white">₹{payModal.amount.toLocaleString('en-IN')}</strong> to Karishma Kumari</p>
+                      <button onClick={() => setPaySuccess(true)} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold text-sm hover:opacity-90 transition-all">
+                        I Have Completed Payment ✓
+                      </button>
+                    </div>
+                  )}
+
+                  <p className="text-center text-xs text-gray-500">✓ UPI Verified · Secured · 24h delivery guaranteed</p>
+                </div>
+              </>
+            ) : (
+              /* Success screen */
+              <div className="p-8 text-center space-y-4">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center text-4xl mx-auto">✓</div>
+                <h3 className="text-2xl font-black tracking-tight">Payment Submitted!</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">Team will verify & start your project within <strong className="text-emerald-400">2 hours</strong>.<br/>WhatsApp the payment screenshot to confirm.</p>
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-left space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Next Steps</p>
+                  {['WhatsApp screenshot to 9818691915','Receive confirmation email in 2 hours','Workflow delivered in 24 hours'].map((step, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm text-gray-300">
+                      <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center text-xs font-bold text-violet-400 flex-shrink-0">{i+1}</div>
+                      {step}
+                    </div>
+                  ))}
+                </div>
+                <a href="https://wa.me/919818691915?text=Hi%20Karishma!%20I%20just%20paid%20for%20Vision%20AI%20Studio%20workflow.%20Please%20confirm%20%F0%9F%99%8F" target="_blank" rel="noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.196.591 4.247 1.622 6.014L.057 23.428l5.5-1.623A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.88 0-3.652-.493-5.193-1.358l-.37-.22-3.266.965.924-3.178-.24-.386A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                  Send Screenshot on WhatsApp
+                </a>
+                <button onClick={closePayModal} className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Close</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

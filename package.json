@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "cspell:check": "cspell \"**/*\" --no-must-find-files",
     "prisma:generate": "prisma generate",

@@ -107,6 +107,15 @@ body {
   }
 }
 
+@keyframes chatSlide {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.chat-slide {
+  animation: chatSlide 0.3s ease both;
+}
+
 @keyframes popIn {
   0% {
     opacity: 0;

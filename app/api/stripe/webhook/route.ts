@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
-import { prisma } from '@/lib/db';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -21,24 +21,20 @@ export async function POST(req: Request) {
     const plan = (session.metadata?.plan as 'PRO' | 'PREMIUM') || 'PRO';
 
     if (userId) {
-      await prisma.subscription.upsert({
-        where: { userId },
-        create: {
-          userId,
-          stripeCustomerId: session.customer?.toString(),
-          stripeSubscriptionId: session.subscription?.toString(),
-          plan,
-          status: 'active'
-        },
-        update: {
-          stripeCustomerId: session.customer?.toString(),
-          stripeSubscriptionId: session.subscription?.toString(),
-          plan,
-          status: 'active'
-        }
-      });
+      const { error: upsertError } = await supabaseAdmin.from('subscriptions').upsert({
+        user_id: userId,
+        stripe_customer_id: session.customer?.toString(),
+        stripe_subscription_id: session.subscription?.toString(),
+        plan,
+        status: 'active',
+      }, { onConflict: 'user_id' });
 
-      await prisma.user.update({ where: { id: userId }, data: { subscriptionPlan: plan } });
+      if (!upsertError) {
+        await supabaseAdmin
+          .from('users')
+          .update({ subscription_status: 'active' })
+          .eq('id', userId);
+      }
     }
   }
 
