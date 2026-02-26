@@ -23,14 +23,14 @@ function useCountUp(target: number, duration = 1800) {
 }
 
 function StatPill({ value, label }: { value: string; label: string }) {
-  const numericTarget = parseInt(value.replace(/\D/g, ''), 10);
-  const suffix = value.replace(/[\d]/g, '');
-  const animated = useCountUp(numericTarget);
+  const numericTarget = parseInt(value.replace(/\D/g, ''), 10)
+  const unit = value.match(/[^\d]+$/)?.[0] ?? ''
+  const animated = useCountUp(numericTarget)
   return (
     <span className="stat-pill">
-      <strong className="text-white font-semibold">{animated}{suffix}</strong> {label}
+      <strong className="text-white font-semibold">{animated}{unit}</strong> {label}
     </span>
-  );
+  )
 }
 
 export function HeroSection() {
