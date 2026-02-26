@@ -12,12 +12,12 @@ Click your OAuth 2.0 Client (Web client 2)
 
 Add to **Authorized redirect URIs**:
 ```
-https://vision-ai-studio-ashy.vercel.app/api/auth/callback/google
+https://vision-ai-studio-git-main-velisions-projects.vercel.app/api/auth/callback/google
 ```
 
 Also add to **Authorized JavaScript origins**:
 ```
-https://vision-ai-studio-ashy.vercel.app
+https://vision-ai-studio-git-main-velisions-projects.vercel.app
 ```
 
 Save. Wait 5 minutes.
@@ -53,9 +53,9 @@ git push -u origin main
 | Variable | Value |
 |----------|-------|
 | `NEXTAUTH_SECRET` | Run: `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | `https://vision-ai-studio-ashy.vercel.app` |
+| `NEXTAUTH_URL` | Your production URL, e.g. `https://vision-ai-studio-git-main-velisions-projects.vercel.app` (use `http://localhost:3000` for local dev) |
 | `NEXT_PUBLIC_SUPABASE_URL` | From Supabase Settings → API |
-| `SUPABASE_SERVICE_KEY` | From Supabase Settings → API (service_role key) |
+| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase Settings → API (service_role key) |
 | `GOOGLE_CLIENT_ID` | `318717295860-vuhr6eh7angp6k56tt99s8jbaimgb0cg.apps.googleusercontent.com` |
 | `GOOGLE_CLIENT_SECRET` | From Google Console |
 
@@ -104,7 +104,7 @@ The error `OAuthSignin` means Google couldn't redirect back.
 
 **Root cause**: Missing redirect URI in Google Console.
 
-**Fix**: Add `https://vision-ai-studio-ashy.vercel.app/api/auth/callback/google` to Google Console redirect URIs (Step 1 above).
+**Fix**: Add `https://vision-ai-studio-git-main-velisions-projects.vercel.app/api/auth/callback/google` to Google Console redirect URIs (Step 1 above).
 
 ---
 
