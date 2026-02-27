@@ -29,7 +29,7 @@ function getAIReply(msg: string): string {
     return 'Process Simple Hai:\n\n1️⃣ Workflow select karo\n2️⃣ Requirements chat mein batao\n3️⃣ 24h mein demo ready\n4️⃣ UPI se payment karo\n5️⃣ Go Live! 🚀'
   if (l.includes('voice') || l.includes('call'))
     return 'AI Voice Agent:\n\n• Incoming calls handle karta hai\n• Lead info collect karta hai\n• Follow-up schedule karta hai\n• Hindi + English dono\n\nStarting ₹4,999 🎙️'
-  return AI_GREETING
+  return 'Namaste! Main Vision AI hoon 🙏\n\nMain inme help kar sakta hoon:\n🎯 Lead Automation\n📦 Export Docs\n🤖 AI Support Bot\n💰 Sales Automation\n🎬 Content Automation\n🎙️ Voice Agent\n\nKya chahiye aapko?'
 }
 
 type PayModal = { service: string; amount: number } | null
