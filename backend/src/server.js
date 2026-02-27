@@ -9,8 +9,16 @@ const { checkTrialExpirations } = require('./services/workflow.engine');
 dotenv.config();
 const app = express();
 
+const corsOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL, 'http://localhost:5173']
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+if (!process.env.FRONTEND_URL) {
+  console.warn('FRONTEND_URL is not set; CORS is restricted to localhost only. Set FRONTEND_URL for production.');
+}
+
 app.use(helmet());
-app.use(cors({ origin: [process.env.FRONTEND_URL, 'http://localhost:5173'].filter(Boolean), credentials: true }));
+app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -25,6 +33,7 @@ app.use('/api/projects', require('./routes/projects.routes'));
 app.use('/api/automation', require('./routes/automation.routes'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'OK', timestamp: new Date().toISOString() }));
+app.get('/favicon.ico', (_req, res) => res.status(204).end());
 app.get('/', (_req, res) => res.json({ service: 'Vision AI Studio API', status: 'running' }));
 
 app.use((req, res) => res.status(404).json({ success: false, error: 'Route not found', path: req.path }));
