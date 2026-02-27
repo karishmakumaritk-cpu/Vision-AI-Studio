@@ -1,4 +1,6 @@
-{
+"scripts": {
+  "start": "node server.js"
+}{
   "name": "vision-ai-studio-backend",
   "version": "0.1.0",
   "private": true,
